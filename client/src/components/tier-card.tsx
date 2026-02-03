@@ -25,7 +25,7 @@ const tierData = {
   },
   knight: {
     icon: Shield,
-    name: "Knight",
+    name: "Lord",
     tierLabel: "TIER 1",
     price: "$1,000",
     priceSubtext: "per month",
