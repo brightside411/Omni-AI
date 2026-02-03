@@ -74,7 +74,7 @@ const tierData = {
   },
   grayl: {
     icon: Lock,
-    name: "Holy GRAYL",
+    name: "Holy Grail",
     tierLabel: "TIER 4",
     price: "HIDDEN",
     priceSubtext: "",
