@@ -56,8 +56,10 @@ export function EcosystemSection() {
                     >
                       <Icon className="w-8 h-8 md:w-10 md:h-10 text-white" />
                     </div>
-                    <div
-                      className={`absolute inset-0 rounded-md bg-gradient-to-br ${step.color} blur-xl opacity-30 group-hover:opacity-50 transition-opacity`}
+                    <motion.div
+                      animate={{ opacity: [0.2, 0.45, 0.2] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      className={`absolute inset-0 rounded-md bg-gradient-to-br ${step.color} blur-xl`}
                     />
                     <p className="text-center text-gray-300 mt-3 font-medium">
                       {step.label}
