@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Lock, Calendar, Clock, Check, ChevronRight } from "lucide-react";
+import { X, Lock, Calendar, Clock, Check, ChevronRight, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +21,56 @@ interface FormData {
   selectedDate: string | null;
   selectedTime: string | null;
 }
+
+const generateCalendarMonth = (year: number, month: number) => {
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const startDayOfWeek = firstDay.getDay();
+  const daysInMonth = lastDay.getDate();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const days: { date: string; dayNum: number; isCurrentMonth: boolean; isPast: boolean; isWeekend: boolean }[] = [];
+  
+  // Add empty slots for days before the first day of the month
+  for (let i = 0; i < startDayOfWeek; i++) {
+    const prevDate = new Date(year, month, -startDayOfWeek + i + 1);
+    days.push({
+      date: prevDate.toISOString().split('T')[0],
+      dayNum: prevDate.getDate(),
+      isCurrentMonth: false,
+      isPast: prevDate < today,
+      isWeekend: prevDate.getDay() === 0 || prevDate.getDay() === 6,
+    });
+  }
+  
+  // Add days of the current month
+  for (let i = 1; i <= daysInMonth; i++) {
+    const date = new Date(year, month, i);
+    days.push({
+      date: date.toISOString().split('T')[0],
+      dayNum: i,
+      isCurrentMonth: true,
+      isPast: date < today,
+      isWeekend: date.getDay() === 0 || date.getDay() === 6,
+    });
+  }
+  
+  // Fill remaining slots to complete the grid
+  const remaining = 42 - days.length;
+  for (let i = 1; i <= remaining; i++) {
+    const nextDate = new Date(year, month + 1, i);
+    days.push({
+      date: nextDate.toISOString().split('T')[0],
+      dayNum: i,
+      isCurrentMonth: false,
+      isPast: false,
+      isWeekend: nextDate.getDay() === 0 || nextDate.getDay() === 6,
+    });
+  }
+  
+  return days;
+};
 
 const generateDays = (weekOffset: number) => {
   const days = [];
@@ -63,6 +113,11 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
   });
   const [days, setDays] = useState<ReturnType<typeof generateDays>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() };
+  });
+  const [calendarDays, setCalendarDays] = useState<ReturnType<typeof generateCalendarMonth>>([]);
   const { toast } = useToast();
 
   const stepOrder: Step[] = ["name", "phone", "email", "dateRange", "time", "confirm", "success"];
@@ -104,8 +159,30 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
     } else if (range === "next-week") {
       setDays(generateDays(1));
     } else {
-      setDays(generateDays(2));
+      const now = new Date();
+      setCalendarMonth({ year: now.getFullYear(), month: now.getMonth() });
+      setCalendarDays(generateCalendarMonth(now.getFullYear(), now.getMonth()));
     }
+  };
+
+  const navigateCalendar = (direction: 'prev' | 'next') => {
+    setCalendarMonth(prev => {
+      let newMonth = prev.month + (direction === 'next' ? 1 : -1);
+      let newYear = prev.year;
+      if (newMonth > 11) {
+        newMonth = 0;
+        newYear++;
+      } else if (newMonth < 0) {
+        newMonth = 11;
+        newYear--;
+      }
+      setCalendarDays(generateCalendarMonth(newYear, newMonth));
+      return { year: newYear, month: newMonth };
+    });
+  };
+
+  const getMonthName = (month: number) => {
+    return new Date(2000, month, 1).toLocaleDateString('en-US', { month: 'long' });
   };
 
   const handleDateSelect = (date: string) => {
@@ -339,7 +416,7 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
                 </motion.div>
               )}
 
-              {step === "dateRange" && formData.dateRange && (
+              {step === "dateRange" && formData.dateRange === "next-week" && (
                 <motion.div
                   key="dateSelect"
                   initial={{ opacity: 0, x: 20 }}
@@ -375,6 +452,78 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
                   <button
                     onClick={() => setFormData({ ...formData, dateRange: null })}
                     className="text-sm text-gray-500 hover:text-white transition-colors"
+                  >
+                    ← Choose different range
+                  </button>
+                </motion.div>
+              )}
+
+              {step === "dateRange" && formData.dateRange === "later" && (
+                <motion.div
+                  key="calendarSelect"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="space-y-4"
+                >
+                  <h2 className="text-2xl md:text-3xl font-bold text-white text-center">
+                    Pick a day
+                  </h2>
+                  
+                  <div className="flex items-center justify-between mb-4">
+                    <button
+                      onClick={() => navigateCalendar('prev')}
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                      data-testid="button-prev-month"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-white" />
+                    </button>
+                    <span className="text-white font-semibold text-lg">
+                      {getMonthName(calendarMonth.month)} {calendarMonth.year}
+                    </span>
+                    <button
+                      onClick={() => navigateCalendar('next')}
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                      data-testid="button-next-month"
+                    >
+                      <ChevronRight className="w-5 h-5 text-white" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-1 mb-2">
+                    {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
+                      <div key={day} className="text-center text-xs text-gray-500 font-medium py-2">
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-1">
+                    {calendarDays.map((day, idx) => {
+                      const isDisabled = day.isPast || day.isWeekend || !day.isCurrentMonth;
+                      return (
+                        <button
+                          key={`${day.date}-${idx}`}
+                          onClick={() => !isDisabled && handleDateSelect(day.date)}
+                          disabled={isDisabled}
+                          className={`p-2 rounded-lg text-center transition-all text-sm ${
+                            !day.isCurrentMonth
+                              ? "text-gray-700"
+                              : isDisabled
+                              ? "text-gray-600 cursor-not-allowed"
+                              : "text-white hover:bg-purple-500/30 hover:border-purple-500/50"
+                          } ${day.isCurrentMonth && !isDisabled ? "bg-white/5" : ""}`}
+                          data-testid={`button-calendar-${day.date}`}
+                        >
+                          {day.dayNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    onClick={() => setFormData({ ...formData, dateRange: null })}
+                    className="text-sm text-gray-500 hover:text-white transition-colors mt-4"
                   >
                     ← Choose different range
                   </button>
