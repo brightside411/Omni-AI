@@ -58,7 +58,7 @@ const tierData = {
   },
   ascended: {
     icon: Flame,
-    name: "Ascended",
+    name: "Elite",
     tierLabel: "TIER 3",
     price: "$10k–$25k",
     priceSubtext: "per month",
