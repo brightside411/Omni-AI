@@ -1,0 +1,184 @@
+Objective
+
+Implement a single CTA button labeled “Book a Demo” that opens a premium, multi-step scheduling flow in a modal or drawer.
+
+This flow should feel:
+
+Fast
+
+Intentional
+
+Scarcity-driven
+
+High-end (not Calendly, not Typeform)
+
+1. ENTRY POINT (CTA BUTTON)
+Button Specs
+
+Label: Book a Demo
+
+High-contrast (Neon Purple / Electric Blue)
+
+Subtle glow + hover lift
+
+Used in:
+
+Hero section
+
+Navigation
+
+Pricing sections
+
+On Click
+
+Open full-screen modal (desktop)
+
+Bottom-sheet modal (mobile)
+
+Background blur + dim
+
+2. FLOW BEHAVIOR (GLOBAL)
+
+One question at a time
+
+Animated transitions (Framer Motion)
+
+Step indicator (●○○○)
+
+Escape closes modal
+
+Progress auto-saves in state
+
+3. STEP SEQUENCE (FIXED)
+STEP 1 — NAME
+
+Prompt
+
+“What’s your name?”
+
+Single text input
+
+Autofocus
+
+Enter → next
+
+STEP 2 — PHONE
+
+Prompt
+
+“Best number to reach you?”
+
+Numeric input
+
+Minimal validation
+
+STEP 3 — EMAIL
+
+Prompt
+
+“Where should we send the confirmation?”
+
+Email input
+
+Validate before continuing
+
+STEP 4 — DATE RANGE (SCARCITY)
+
+Prompt
+
+“When should we talk?”
+
+Options (buttons)
+
+This week
+
+Show next 7 days
+
+Randomly disable ~33% of days
+
+Greyed out with lock icon
+
+Next week
+
+Fully available
+
+Highlighted “Most Popular”
+
+Farther out
+
+Opens flexible date picker
+
+Availability is simulated, not calendar-bound.
+
+STEP 5 — TIME
+
+After day selection:
+
+Show 3–5 time blocks
+
+Some labeled “Filling fast”
+
+One-click select
+
+STEP 6 — CONFIRM
+
+Show summary:
+
+Name
+
+Email
+
+Date & time
+
+CTA:
+
+Confirm Demo
+
+4. SUCCESS STATE
+
+After confirmation:
+
+Headline
+
+“Your demo is locked in.”
+
+Subtext:
+
+“If this is a fit, we’ll show you how Omni AI runs lead flow without manual work.”
+
+Buttons:
+
+Add to Calendar
+
+Close
+
+5. DATA HANDLING (SIMPLE & CLEAN)
+
+On submit:
+
+Log lead (name, phone, email, date/time)
+
+Tag as demo-booked
+
+Trigger confirmation email/SMS
+
+Send internal notification
+
+Do NOT build complex CRM logic yet — just clean handoff.
+
+6. DESIGN REQUIREMENTS
+
+Dark mode only (#050505)
+
+Glassmorphism card
+
+Neon gradient borders
+
+Cursor spotlight active
+
+Mobile-first spacing
+
+7. FINAL INSTRUCTION
+
+This entire experience must feel like a private invite, not a scheduling tool.
+If it feels like Calendly or Typeform, redesign it.

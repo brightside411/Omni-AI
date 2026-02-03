@@ -3,7 +3,11 @@ import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function Navbar() {
+interface NavbarProps {
+  onBookDemo?: () => void;
+}
+
+export function Navbar({ onBookDemo }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -60,6 +64,7 @@ export function Navbar() {
             <Button
               variant="outline"
               className="border-white/20 bg-transparent text-white"
+              onClick={onBookDemo}
               data-testid="button-nav-demo"
             >
               Book Demo
@@ -108,6 +113,10 @@ export function Navbar() {
                 <Button
                   variant="outline"
                   className="border-white/20 bg-transparent text-white w-full"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onBookDemo?.();
+                  }}
                   data-testid="button-mobile-demo"
                 >
                   Book Demo

@@ -8,16 +8,18 @@ import { EcosystemSection } from "@/components/ecosystem-section";
 import { TestimonialsSection } from "@/components/testimonials-section";
 import { ContactSection } from "@/components/contact-section";
 import { Footer } from "@/components/footer";
+import { BookDemoModal } from "@/components/book-demo-modal";
 
 export default function Landing() {
   const [selectedTier, setSelectedTier] = useState<string>("peasant");
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#050505] text-white noise-overlay">
       <CursorSpotlight />
-      <Navbar />
+      <Navbar onBookDemo={() => setIsDemoModalOpen(true)} />
       <main>
-        <HeroSection />
+        <HeroSection onBookDemo={() => setIsDemoModalOpen(true)} />
         <ServicesSection onTierSelect={setSelectedTier} />
         <LegacySection />
         <EcosystemSection />
@@ -25,6 +27,10 @@ export default function Landing() {
         <ContactSection preselectedTier={selectedTier} />
       </main>
       <Footer />
+      <BookDemoModal 
+        isOpen={isDemoModalOpen} 
+        onClose={() => setIsDemoModalOpen(false)} 
+      />
     </div>
   );
 }

@@ -8,7 +8,11 @@ const metrics = [
   { icon: TrendingUp, value: "11x", label: "ROI" },
 ];
 
-export function HeroSection() {
+interface HeroSectionProps {
+  onBookDemo?: () => void;
+}
+
+export function HeroSection({ onBookDemo }: HeroSectionProps) {
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-20 pb-24 overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
@@ -72,6 +76,7 @@ export function HeroSection() {
             size="lg"
             variant="outline"
             className="border-white/20 bg-white/5 backdrop-blur-sm text-white px-8 py-6 text-lg rounded-md"
+            onClick={onBookDemo}
             data-testid="button-book-demo"
           >
             Book a Demo
