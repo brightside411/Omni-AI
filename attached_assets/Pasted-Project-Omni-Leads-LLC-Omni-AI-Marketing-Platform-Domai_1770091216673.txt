@@ -1,0 +1,398 @@
+Project: Omni Leads LLC — Omni AI Marketing Platform
+Domain: omnileadsllc.com
+Objective: Build a high-end, dark-luxury, conversion-focused marketing website that positions Omni AI as a tiered AGI-powered business operating system — not a SaaS tool.
+
+1. CORE GOAL
+
+Build a fully responsive, super-modern marketing website that:
+
+Feels exclusive, powerful, and inevitable
+
+Educates users through a tiered ascension model
+
+Converts Tier 0 → Tier 1
+
+Filters Tier 2–3
+
+Hides Tier 4 (Holy GRAYL) entirely unless unlocked
+
+This is not a mass-market site.
+It should feel like the front door to something dangerous and valuable.
+
+2. TECH STACK (NON-NEGOTIABLE)
+
+Framework: React + Vite
+
+Styling: Tailwind CSS
+
+Use backdrop-blur, bg-white/5, border-white/10
+
+Custom glowing gradient borders
+
+Animation: Framer Motion
+
+Scroll reveals
+
+Bento grid motion
+
+Hover elevation
+
+Icons: lucide-react
+
+Fonts: Inter or Sora
+
+Theme: Dark mode ONLY
+
+3. GLOBAL DESIGN SYSTEM
+Color Palette
+
+Background: #050505
+
+Panels: rgba(255,255,255,0.04)
+
+Borders: Gradient neon wire effect
+(linear-gradient with purple → blue → cyan)
+
+Accent CTA: Neon Purple or Electric Blue
+
+Text: Soft white (#EDEDED) with muted grays
+
+Effects
+
+Subtle grain / noise overlay
+
+Glassmorphism cards
+
+Hover glow
+
+Cursor spotlight effect (important)
+
+A faint radial light follows the mouse
+
+Implement using CSS + mouse position listener
+
+4. HERO SECTION (ABOVE THE FOLD)
+Top Badge
+
+Small pill badge with glow border:
+
+“Introducing the world’s first AGI Legacy Model”
+
+Main Header
+
+Huge, bold typography:
+
+Omni AI
+
+Subtext
+
+Short, lethal value prop:
+
+Autonomous AGI systems that generate leads, run operations, and scale businesses without human micromanagement.
+
+CTA
+
+Primary:
+
+“Start Free Now” → Tier 0
+
+Secondary (ghost button):
+
+“Book a Demo”
+
+5. THE MODEL (BASED ON THE WHITEBOARD IMAGE)
+
+The entire site hierarchy must be driven by this ascension model:
+
+Peasant  →  Knight  →  Royal  →  Ascended  →  Holy GRAYL (Hidden)
+Tier 0      Tier 1     Tier 2      Tier 3        Tier 4
+
+
+This is critical.
+Everything visually reinforces progression.
+
+6. SERVICES PAGE — MAIN CONVERSION ENGINE
+STRUCTURE
+
+Use a vertical ascension layout (bottom → top), not flat pricing cards.
+
+🟤 TIER 0 — PEASANT (FREE)
+
+Positioning
+
+“This is where people wake up.”
+
+CTA (Primary)
+
+Start Free Now
+
+What It Includes
+
+Content
+
+Stories
+
+Warnings
+
+Examples
+
+Message
+
+“AI is taking jobs.
+Either you use it — or it replaces you.”
+
+Design notes:
+
+Minimal
+
+Almost ominous
+
+Feels like an initiation
+
+⚔️ TIER 1 — KNIGHT ($1,000 / month)
+
+Tagline
+
+“The robot helps you do work faster.”
+
+Who It’s For
+
+Creators
+
+Freelancers
+
+Solo founders
+
+What It Does
+
+Finds potential buyers
+
+Sends first messages
+
+Helps reply
+
+Organizes leads
+
+Provides templates
+
+Tools
+
+Lead scraper
+
+Auto DMs
+
+Comment → DM
+
+Simple CRM
+
+Message templates
+
+CTA
+
+Activate Knight Tier
+
+Design notes:
+
+Clean
+
+Plug-and-play feel
+
+No customization language
+
+👑 TIER 2 — ROYAL ($3k–$5k / month)
+
+Tagline
+
+“The robot runs the system, not just tasks.”
+
+Who It’s For
+
+Agencies
+
+Sales teams
+
+Service businesses
+
+What It Does
+
+Lead state management
+
+Automated follow-ups
+
+Multi-account handling
+
+Content repurposing
+
+Dashboards
+
+Tools
+
+Everything from Knight
+
+Booking system
+
+Follow-up logic
+
+Multiple AI agents
+
+SOPs
+
+Analytics
+
+CTA
+
+Apply for Royal Access
+
+Design notes:
+
+More powerful visuals
+
+Slight friction (application language)
+
+🜂 TIER 3 — ASCENDED ($10k–$25k / month)
+
+Tagline
+
+“The robot makes decisions for the business.”
+
+Who It’s For
+
+Proven businesses only
+
+What It Does
+
+Decides who to message
+
+Kills bad campaigns
+
+Allocates effort
+
+Runs sales + ops + content
+
+Learns and improves
+
+Reports weekly
+
+Tools
+
+Multiple autonomous agents
+
+KPI tracking
+
+Decision rules
+
+Self-optimizing systems
+
+CTA
+
+Request Ascension Review
+
+Design notes:
+
+Feels dangerous
+
+Power > convenience
+
+Scarcity language
+
+🔒 TIER 4 — HOLY GRAYL (SECRET)
+
+IMPORTANT
+
+NO PUBLIC CARD
+
+NO PRICING
+
+NO CTA
+
+Only visible if:
+
+User is logged in
+
+AND flagged as Tier 3
+
+If accessed without permission:
+
+“You are not ready.”
+
+This tier is referenced indirectly only:
+
+“Legacy Model”
+
+“AGI Continuity”
+
+“Your thinking — preserved”
+
+7. OTHER REQUIRED SECTIONS
+🧠 Legacy Model Breakdown
+
+3-column bento grid:
+
+Memory
+
+Decision Logic
+
+Self-Improvement
+
+🔁 Omni AI Ecosystem
+
+Visual flow:
+AI → Leads → Ops → Revenue → Learning Loop
+
+📨 Contact / Waitlist
+
+Minimal glass form:
+
+Name
+
+Email
+
+Business URL
+
+Tier interest (dropdown)
+
+8. PRO-TIPS TO IMPLEMENT AFTER MVP
+
+After first build, improve with:
+
+Spotlight cursor effect
+
+Border glow intensity increases on hover
+
+Slight parallax on hero text
+
+Ascension animation between tiers
+
+Lock icon animation on Holy GRAYL references
+
+9. THINGS YOU WERE MISSING (IMPORTANT)
+
+These will increase conversions a lot:
+
+1. Narrative Copy Between Sections
+
+Add short philosophical lines between tiers:
+
+“Tools make you faster.
+Systems make you inevitable.”
+
+2. Scarcity Signals
+
+“Limited Knight slots per month”
+
+“Royal onboarding capped”
+
+“Ascended by referral only”
+
+3. No Testimonials (At First)
+
+This brand works better without them initially.
+Mystery > proof.
+
+4. SEO Is Secondary
+
+This is a direct-response brand, not a blog farm.
+
+5. The Website Should Feel Like a Filter
+
+If everyone feels comfortable here, it failed.
