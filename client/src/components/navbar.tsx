@@ -20,6 +20,7 @@ export function Navbar() {
     { href: "#services", label: "Services" },
     { href: "#legacy", label: "Legacy Model" },
     { href: "#ecosystem", label: "Ecosystem" },
+    { href: "#testimonials", label: "Results" },
     { href: "#contact", label: "Contact" },
   ];
 
