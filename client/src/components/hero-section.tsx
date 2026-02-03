@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 
 const metrics = [
   { icon: Clock, value: "24/7", label: "Execution" },
-  { icon: Eye, value: "10M+", label: "Impressions" },
-  { icon: TrendingUp, value: "60x", label: "ROI" },
+  { icon: Eye, value: "20M", label: "Impressions" },
+  { icon: TrendingUp, value: "11x", label: "ROI" },
 ];
 
 export function HeroSection() {
