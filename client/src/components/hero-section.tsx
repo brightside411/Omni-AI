@@ -100,8 +100,8 @@ export function HeroSection({ onBookDemo, onSignIn }: HeroSectionProps) {
               className="flex flex-col items-center text-center gap-2"
               data-testid={`metric-${metric.label.toLowerCase()}`}
             >
-              <div className="flex items-center justify-center gap-2">
-                <metric.icon className="w-5 h-5 text-purple-400" />
+              <div className="relative flex items-center justify-center">
+                <metric.icon className="w-5 h-5 text-purple-400 absolute -left-7" />
                 <span className="text-2xl md:text-3xl font-bold text-gradient">
                   {metric.value}
                 </span>
