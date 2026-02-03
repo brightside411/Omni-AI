@@ -57,6 +57,22 @@ Glassmorphism form with fields:
 - Business URL (optional)
 - Tier Interest (dropdown)
 
+### 6. Book a Demo Modal
+Multi-step premium demo booking flow with 6 animated steps:
+1. Name input
+2. Phone number input
+3. Email input
+4. Date range selection (This week / Next week / Farther out) + day picker
+5. Time slot selection (9 AM, 11 AM, 1 PM, 3 PM, 5 PM)
+6. Confirmation summary
+
+Features:
+- Bottom-sheet style on mobile, centered modal on desktop
+- Animated step transitions with Framer Motion
+- Progress dots indicator
+- Success state with Google Calendar integration
+- Connected to hero CTA and navbar "Book Demo" buttons
+
 ## API Endpoints
 
 ### POST /api/waitlist
@@ -83,14 +99,40 @@ Submit a waitlist entry.
 ### GET /api/waitlist
 Retrieve all waitlist entries.
 
+### POST /api/demo-booking
+Submit a demo booking request.
+
+**Request Body:**
+```json
+{
+  "name": "string",
+  "phone": "string",
+  "email": "string",
+  "date": "string (YYYY-MM-DD)",
+  "time": "string (e.g., '9:00 AM')"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "booking": { ... }
+}
+```
+
+### GET /api/demo-booking
+Retrieve all demo bookings.
+
 ## Project Structure
 ```
 client/
   src/
     components/
+      book-demo-modal.tsx     # Multi-step demo booking modal
       cursor-spotlight.tsx    # Mouse-following spotlight effect
-      navbar.tsx              # Fixed navigation bar
-      hero-section.tsx        # Hero with CTAs
+      navbar.tsx              # Fixed navigation bar (with Book Demo CTA)
+      hero-section.tsx        # Hero with CTAs (Book Demo opens modal)
       tier-card.tsx           # Individual tier card component
       services-section.tsx    # All tier cards with ascension layout
       legacy-section.tsx      # Bento grid for legacy model
@@ -122,6 +164,9 @@ npm run dev
 ```
 
 ## Recent Changes
+- Added multi-step Book Demo modal with 6-step flow (Feb 2026)
+- Backend support for demo bookings (schema, storage, API)
+- Connected modal to hero and navbar CTAs
 - Initial MVP implementation (Feb 2026)
 - Dark luxury theme with glassmorphism
 - Tiered pricing model with 5 tiers
