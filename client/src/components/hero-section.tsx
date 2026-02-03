@@ -89,7 +89,7 @@ export function HeroSection({ onBookDemo, onSignIn }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.9 }}
-          className="flex flex-wrap items-center justify-center gap-8 md:gap-16 mt-16 mb-20"
+          className="flex flex-wrap items-center justify-center gap-12 md:gap-20 mt-16 mb-20 w-full"
         >
           {metrics.map((metric, index) => (
             <motion.div
