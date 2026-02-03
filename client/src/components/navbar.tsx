@@ -97,7 +97,7 @@ export function Navbar({ onBookDemo }: NavbarProps) {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="md:hidden py-4 border-t border-white/5"
+              className="md:hidden py-4 border-t border-white/5 bg-[#050505]"
             >
             <div className="flex flex-col gap-4 px-1">
               {navLinks.map((link) => (
