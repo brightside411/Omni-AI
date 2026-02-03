@@ -308,27 +308,17 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
                   </h2>
                   <div className="space-y-3">
                     <button
-                      onClick={() => handleDateRangeSelect("this-week")}
-                      className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-left hover:bg-white/10 transition-colors group"
-                      data-testid="button-this-week"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-white font-medium">This week</span>
-                        <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
-                      </div>
-                      <p className="text-sm text-gray-500 mt-1">Limited availability</p>
-                    </button>
-
-                    <button
                       onClick={() => handleDateRangeSelect("next-week")}
-                      className="w-full p-4 rounded-xl bg-white/5 border border-purple-500/50 text-left hover:bg-white/10 transition-colors group relative overflow-hidden"
+                      className="w-full p-4 rounded-xl bg-white/5 border border-purple-500/50 text-left hover:bg-white/10 transition-colors group"
                       data-testid="button-next-week"
                     >
-                      <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 text-xs font-medium">
-                        Most Popular
-                      </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-white font-medium">Next week</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-white font-medium">Next week</span>
+                          <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 text-xs font-medium">
+                            Most Popular
+                          </span>
+                        </div>
                         <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
                       </div>
                       <p className="text-sm text-gray-500 mt-1">Fully available</p>
@@ -340,10 +330,10 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
                       data-testid="button-later"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-white font-medium">Farther out</span>
+                        <span className="text-white font-medium">Custom time</span>
                         <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
                       </div>
-                      <p className="text-sm text-gray-500 mt-1">More flexibility</p>
+                      <p className="text-sm text-gray-500 mt-1">Choose your preferred date</p>
                     </button>
                   </div>
                 </motion.div>
@@ -525,14 +515,16 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
                   viewBox="0 0 100 100"
                   className="w-32 h-32 md:w-48 md:h-48"
                 >
-                  <circle cx="50" cy="50" r="28" fill="none" stroke="url(#orbital-gradient)" strokeWidth="3" opacity="0.6" />
-                  <circle cx="50" cy="22" r="10" fill="url(#orbital-gradient)" />
-                  <circle cx="25" cy="64" r="10" fill="url(#orbital-gradient)" />
-                  <circle cx="75" cy="64" r="10" fill="url(#orbital-gradient)" />
-                  <circle cx="50" cy="50" r="6" fill="url(#orbital-gradient)" />
-                  <line x1="50" y1="50" x2="50" y2="22" stroke="url(#orbital-gradient)" strokeWidth="2" opacity="0.5" />
-                  <line x1="50" y1="50" x2="25" y2="64" stroke="url(#orbital-gradient)" strokeWidth="2" opacity="0.5" />
-                  <line x1="50" y1="50" x2="75" y2="64" stroke="url(#orbital-gradient)" strokeWidth="2" opacity="0.5" />
+                  <circle cx="50" cy="50" r="30" fill="none" stroke="url(#orbital-gradient)" strokeWidth="2" opacity="0.4" />
+                  <circle cx="50" cy="20" r="8" fill="url(#orbital-gradient)" />
+                  <circle cx="50" cy="80" r="8" fill="url(#orbital-gradient)" />
+                  <circle cx="20" cy="50" r="8" fill="url(#orbital-gradient)" />
+                  <circle cx="80" cy="50" r="8" fill="url(#orbital-gradient)" />
+                  <circle cx="50" cy="50" r="5" fill="url(#orbital-gradient)" />
+                  <line x1="50" y1="50" x2="50" y2="20" stroke="url(#orbital-gradient)" strokeWidth="2" opacity="0.5" />
+                  <line x1="50" y1="50" x2="50" y2="80" stroke="url(#orbital-gradient)" strokeWidth="2" opacity="0.5" />
+                  <line x1="50" y1="50" x2="20" y2="50" stroke="url(#orbital-gradient)" strokeWidth="2" opacity="0.5" />
+                  <line x1="50" y1="50" x2="80" y2="50" stroke="url(#orbital-gradient)" strokeWidth="2" opacity="0.5" />
                   <defs>
                     <linearGradient id="orbital-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stopColor="#9333ea" />
