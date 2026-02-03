@@ -164,15 +164,15 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
         <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
 
         <motion.div
-          initial={{ opacity: 0, y: 100, scale: 0.95 }}
+          initial={{ opacity: 0, y: 50, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 100, scale: 0.95 }}
+          exit={{ opacity: 0, y: 50, scale: 0.95 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
           onClick={(e) => e.stopPropagation()}
-          className="relative w-full max-w-lg mx-4 md:mx-0 mt-auto md:mt-0 rounded-t-2xl md:rounded-2xl overflow-hidden"
+          className="relative w-full max-w-lg mx-4 rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
         >
           <div className="absolute inset-0 bg-gradient-to-b from-white/[0.08] to-transparent" />
-          <div className="absolute inset-[1px] rounded-t-2xl md:rounded-2xl bg-[#0a0a0a]" />
+          <div className="absolute inset-[1px] rounded-2xl bg-[#0a0a0a]" />
 
           <div className="relative p-6 md:p-8">
             <button

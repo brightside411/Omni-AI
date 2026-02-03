@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -90,13 +90,15 @@ export function Navbar({ onBookDemo }: NavbarProps) {
           </button>
         </div>
 
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="md:hidden py-4 border-t border-white/5"
-          >
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden py-4 border-t border-white/5 bg-black/95 backdrop-blur-lg"
+            >
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
                 <a
@@ -130,7 +132,8 @@ export function Navbar({ onBookDemo }: NavbarProps) {
               </div>
             </div>
           </motion.div>
-        )}
+          )}
+        </AnimatePresence>
       </div>
     </motion.nav>
   );
