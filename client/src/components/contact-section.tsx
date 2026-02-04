@@ -186,13 +186,13 @@ export function ContactSection({ preselectedTier }: ContactSectionProps) {
                             Tier 0 — Peasant (Free)
                           </SelectItem>
                           <SelectItem value="knight" data-testid="select-tier-knight">
-                            Tier 1 — Knight ($1,000/mo)
+                            Tier 1 — Master ($1,000/mo)
                           </SelectItem>
                           <SelectItem value="royal" data-testid="select-tier-royal">
                             Tier 2 — Royal ($3k–$5k/mo)
                           </SelectItem>
                           <SelectItem value="ascended" data-testid="select-tier-ascended">
-                            Tier 3 — Ascended ($10k–$25k/mo)
+                            Tier 3 — Empire ($10k–$25k/mo)
                           </SelectItem>
                         </SelectContent>
                       </Select>
