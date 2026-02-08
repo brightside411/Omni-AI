@@ -4,6 +4,7 @@ import { Navbar } from "@/components/navbar";
 import { HeroSection } from "@/components/hero-section";
 import { ServicesSection } from "@/components/services-section";
 import { LegacySection } from "@/components/legacy-section";
+import { CampaignsSection } from "@/components/campaigns-section";
 import { EcosystemSection } from "@/components/ecosystem-section";
 import { TestimonialsSection } from "@/components/testimonials-section";
 import { ContactSection } from "@/components/contact-section";
@@ -30,6 +31,7 @@ export default function Landing() {
         />
         <ServicesSection onTierSelect={setSelectedTier} />
         <LegacySection />
+        <CampaignsSection />
         <EcosystemSection />
         <TestimonialsSection />
         <ContactSection preselectedTier={selectedTier} />
