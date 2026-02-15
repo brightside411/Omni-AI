@@ -37,6 +37,22 @@ const platforms = [
 
 type FunnelStep = "signup" | "basic" | "business" | "activation";
 
+function getResumeStep(profile: { name: string | null; phone: string | null; business_owner: boolean | null; business_name: string | null; onboarding_completed: boolean }): FunnelStep {
+  if (!profile.name || !profile.phone) {
+    return "basic";
+  }
+  if (profile.business_owner === null || profile.business_owner === undefined) {
+    return "business";
+  }
+  if (profile.business_owner === true && !profile.business_name) {
+    return "business";
+  }
+  if (!profile.onboarding_completed) {
+    return "activation";
+  }
+  return "basic";
+}
+
 export default function Join() {
   const { user, loading: authLoading, signUp, signIn } = useAuth();
   const { profile, profileLoading, upsertProfile } = useProfile();
@@ -64,17 +80,31 @@ export default function Join() {
   const [activatedPlatforms, setActivatedPlatforms] = useState<string[]>([]);
   const [platformPage, setPlatformPage] = useState(0);
 
+  const [hasResumed, setHasResumed] = useState(false);
+
   useEffect(() => {
-    if (!authLoading && user && step === "signup") {
-      setStep("basic");
+    if (authLoading || profileLoading) return;
+
+    if (user && !hasResumed) {
+      if (profile) {
+        if (profile.onboarding_completed) {
+          setLocation("/dashboard");
+          return;
+        }
+        const resumeStep = getResumeStep(profile);
+        setStep(resumeStep);
+      } else {
+        setStep("basic");
+      }
+      setHasResumed(true);
     }
-  }, [user, authLoading, step]);
+  }, [user, authLoading, profileLoading, profile, hasResumed, setLocation]);
 
   useEffect(() => {
     if (profile) {
       if (profile.name) setName(profile.name);
       if (profile.phone) setPhone(profile.phone);
-      setBusinessOwner(profile.business_owner || null);
+      setBusinessOwner(profile.business_owner ?? null);
       if (profile.business_name) setBusinessName(profile.business_name);
       if (profile.business_niche) setBusinessNiche(profile.business_niche);
       if (profile.business_details) setBusinessDetails(profile.business_details);
@@ -106,7 +136,7 @@ export default function Join() {
           return;
         }
         toast({ title: "Welcome back!", description: "Signed in successfully." });
-        setStep("basic");
+        setHasResumed(false);
       } else {
         const { error } = await signUp(email.trim(), password);
         if (error) {
@@ -116,6 +146,7 @@ export default function Join() {
         }
         toast({ title: "Account created!", description: "Let's set up your profile." });
         setStep("basic");
+        setHasResumed(true);
       }
     } catch (err: any) {
       toast({ title: "Error", description: err.message || "Something went wrong.", variant: "destructive" });
@@ -231,7 +262,7 @@ export default function Join() {
           <p className="text-gray-400">
             {step === "signup"
               ? (isSignInMode ? "Sign in to continue to your account" : "Create your account to get started")
-              : "Set up your profile to unlock the full Omni AI experience"}
+              : "Please fill out this information to continue"}
           </p>
         </div>
 

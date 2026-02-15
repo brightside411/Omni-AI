@@ -77,7 +77,7 @@ export function HeroSection({ onBookDemo, onSignIn }: HeroSectionProps) {
               if (user) {
                 setLocation("/dashboard");
               } else {
-                setLocation("/join");
+                onSignIn?.();
               }
             }}
             data-testid="button-start-free"

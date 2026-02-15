@@ -153,7 +153,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (!loading && !user) {
       const timer = setTimeout(() => {
-        setLocation("/join");
+        setLocation("/");
       }, 500);
       return () => clearTimeout(timer);
     }
@@ -237,11 +237,13 @@ export default function Dashboard() {
               data-testid="banner-complete-account"
             >
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white">Complete your account setup</p>
+                <p className="text-sm font-medium text-white">You haven't finished setting up your account</p>
                 <p className="text-xs text-gray-400 mt-0.5">
                   {!profile.name || !profile.phone
-                    ? "Add your name and phone number to get started."
-                    : "Finish setting up your platforms to unlock the full experience."}
+                    ? "Please fill out your basic info to continue."
+                    : profile.business_owner === null || (profile.business_owner && !profile.business_name)
+                      ? "Please fill out your business information to continue."
+                      : "Finish activating your platforms to unlock the full experience."}
                 </p>
               </div>
               <Button
@@ -250,7 +252,7 @@ export default function Dashboard() {
                 onClick={() => setLocation("/join")}
                 data-testid="button-complete-setup"
               >
-                Complete Setup
+                Continue
                 <ArrowRight className="w-3 h-3 ml-1.5" />
               </Button>
             </div>

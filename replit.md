@@ -194,8 +194,11 @@ Admin user: sitanim6@gmail.com (auto-assigned admin role on profile creation)
 - Sign-up step is shown first for unauthenticated users; authenticated users skip to step 2
 - Skip option saves partial data and goes to /dashboard
 - Progress bar shows Sign Up → Basic Info → Business → Activate
-- Hero "Start Free Now" button navigates to /join
-- Dashboard/Admin redirect unauthenticated users to /join
+- Hero "Start Free Now" opens sign-in modal; "Don't have an account? Sign up" navigates to /join
+- Dashboard/Admin redirect unauthenticated users to / (homepage)
+- Returning users with partial onboarding auto-resume from their last saved step
+- Users who completed onboarding are redirected to /dashboard
+- Dashboard shows "You haven't finished setting up" banner with "Continue" button
 
 ## Admin Panel (/admin)
 - Protected route for admin users only
@@ -204,12 +207,15 @@ Admin user: sitanim6@gmail.com (auto-assigned admin role on profile creation)
 - View user details (email, phone, business, platforms)
 
 ## Recent Changes
-- Moved sign-up into /join onboarding funnel (Feb 2026)
-  - Sign-up is now step 1 of the funnel (email + password + confirm)
-  - Toggle to "Already have an account? Sign In" at bottom
-  - Hero "Start Free Now" navigates to /join instead of opening auth modal
-  - Dashboard/Admin redirect to /join when not authenticated
-  - 4-step progress: Sign Up → Basic Info → Business → Activate
+- Updated auth flow: sign-in modal + /join funnel separation (Feb 2026)
+  - Hero "Start Free Now" opens sign-in modal (not /join)
+  - Auth modal "Don't have an account? Sign up" navigates to /join
+  - /join sign-up is step 1 of funnel (email + password + confirm)
+  - Sign-in on /join via "Already have an account?" toggle
+  - Returning users auto-resume from last saved onboarding step
+  - Completed onboarding users visiting /join → redirected to /dashboard
+  - Dashboard "Continue" button resumes onboarding at last saved step
+  - Dashboard/Admin redirect unauthenticated users to / (homepage)
 - Added user onboarding flow at /join (Feb 2026)
   - Multi-step form: basic info, business info, platform activation
   - Skip option, progress indicators, platform pagination

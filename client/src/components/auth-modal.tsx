@@ -14,11 +14,10 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ isOpen, onClose, prompt }: AuthModalProps) {
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const { signIn } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -27,9 +26,7 @@ export function AuthModal({ isOpen, onClose, prompt }: AuthModalProps) {
     setIsLoading(true);
 
     try {
-      const { error } = mode === "signin" 
-        ? await signIn(email, password)
-        : await signUp(email, password);
+      const { error } = await signIn(email, password);
 
       if (error) {
         toast({
@@ -38,21 +35,12 @@ export function AuthModal({ isOpen, onClose, prompt }: AuthModalProps) {
           variant: "destructive",
         });
       } else {
-        if (mode === "signup") {
-          toast({
-            title: "Account created!",
-            description: "Let's complete your profile.",
-          });
-          onClose();
-          setLocation("/join");
-        } else {
-          toast({
-            title: "Welcome back!",
-            description: "You have successfully signed in.",
-          });
-          onClose();
-          setLocation("/dashboard");
-        }
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+        });
+        onClose();
+        setLocation("/dashboard");
         setEmail("");
         setPassword("");
       }
@@ -95,15 +83,13 @@ export function AuthModal({ isOpen, onClose, prompt }: AuthModalProps) {
 
             <div className="text-center mb-6">
               <h2 className="text-2xl md:text-3xl font-bold text-gradient mb-2" data-testid="text-auth-heading">
-                {mode === "signin" ? "Welcome Back" : "Create Account"}
+                Welcome Back
               </h2>
               {prompt ? (
                 <p className="text-gray-400 text-sm" data-testid="text-auth-prompt">{prompt}</p>
               ) : (
                 <p className="text-gray-400 text-sm">
-                  {mode === "signin" 
-                    ? "Sign in to access your account" 
-                    : "Join the Omni AI revolution"}
+                  Sign in to access your account
                 </p>
               )}
             </div>
@@ -144,40 +130,25 @@ export function AuthModal({ isOpen, onClose, prompt }: AuthModalProps) {
               >
                 {isLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
-                ) : mode === "signin" ? (
-                  "Sign In"
                 ) : (
-                  "Create Account"
+                  "Sign In"
                 )}
               </Button>
             </form>
 
             <p className="text-center text-gray-500 text-sm mt-6">
-              {mode === "signin" ? (
-                <>
-                  Don't have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => setMode("signup")}
-                    className="text-purple-400 hover:text-purple-300 transition-colors"
-                    data-testid="button-switch-signup"
-                  >
-                    Sign up
-                  </button>
-                </>
-              ) : (
-                <>
-                  Already have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => setMode("signin")}
-                    className="text-purple-400 hover:text-purple-300 transition-colors"
-                    data-testid="button-switch-signin"
-                  >
-                    Sign in
-                  </button>
-                </>
-              )}
+              Don't have an account?{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  setLocation("/join");
+                }}
+                className="text-purple-400 hover:text-purple-300 transition-colors"
+                data-testid="button-switch-signup"
+              >
+                Sign up
+              </button>
             </p>
           </motion.div>
         </motion.div>

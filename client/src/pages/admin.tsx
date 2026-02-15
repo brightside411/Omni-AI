@@ -25,7 +25,7 @@ export default function Admin() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      setLocation("/join");
+      setLocation("/");
     }
   }, [user, authLoading, setLocation]);
 
