@@ -158,11 +158,16 @@ export default function Join() {
     }
   };
 
-  const handleSkip = async () => {
-    setIsLoading(true);
-    await saveProgress();
-    setIsLoading(false);
-    setLocation("/dashboard");
+  const handleSkipBasic = () => {
+    setStep("business");
+  };
+
+  const handleSkipBusiness = () => {
+    setStep("activation");
+  };
+
+  const handleSkipActivation = async () => {
+    await handleComplete();
   };
 
   const handleBasicNext = async () => {
@@ -408,7 +413,7 @@ export default function Join() {
                   <Button
                     variant="outline"
                     className="border-white/20 bg-transparent text-gray-400"
-                    onClick={handleSkip}
+                    onClick={handleSkipBasic}
                     disabled={isLoading}
                     data-testid="button-skip"
                   >
@@ -516,7 +521,7 @@ export default function Join() {
                   <Button
                     variant="outline"
                     className="border-white/20 bg-transparent text-gray-400"
-                    onClick={handleSkip}
+                    onClick={handleSkipBusiness}
                     disabled={isLoading}
                     data-testid="button-skip-business"
                   >
@@ -665,7 +670,7 @@ export default function Join() {
                       <Button
                         variant="outline"
                         className="border-white/20 bg-transparent text-gray-400"
-                        onClick={handleSkip}
+                        onClick={handleSkipActivation}
                         disabled={isLoading}
                         data-testid="button-skip-activation"
                       >
