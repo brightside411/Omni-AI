@@ -150,7 +150,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!loading && !user) {
-      setLocation("/?auth=dashboard");
+      const timer = setTimeout(() => {
+        setLocation("/?auth=dashboard");
+      }, 500);
+      return () => clearTimeout(timer);
     }
   }, [user, loading, setLocation]);
 
@@ -162,7 +165,13 @@ export default function Dashboard() {
     );
   }
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   const handleSignOut = async () => {
     await signOut();
