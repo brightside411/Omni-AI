@@ -26,13 +26,7 @@ export default function Landing() {
     setIsAuthModalOpen(true);
   };
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("auth") === "dashboard") {
-      openAuthWithPrompt("It doesn't look like you've signed in yet. Please sign in to continue.");
-      window.history.replaceState({}, "", "/");
-    }
-  }, []);
+  
 
   return (
     <div className="min-h-screen bg-[#050505] text-white noise-overlay">

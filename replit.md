@@ -185,13 +185,17 @@ Admin user: sitanim6@gmail.com (auto-assigned admin role on profile creation)
 - **admin**: Access to /admin panel for user management
 - Role managed via `useProfile` hook (client/src/hooks/use-profile.tsx)
 
-## Onboarding Flow (/join)
-Multi-step form after sign-up:
-1. Basic Info (name, phone)
-2. Business Info (yes/no business owner, conditional fields)
-3. Platform Activation (18 platforms, 4 shown at a time, toggle on/off)
+## Onboarding Funnel (/join)
+4-step funnel with built-in sign-up:
+1. Sign Up (email + password, with "Already have an account? Sign In" toggle)
+2. Basic Info (name, phone)
+3. Business Info (yes/no business owner, conditional fields)
+4. Platform Activation (18 platforms, 4 shown at a time, toggle on/off)
+- Sign-up step is shown first for unauthenticated users; authenticated users skip to step 2
 - Skip option saves partial data and goes to /dashboard
-- Progress bar shows Sign Up → Complete Account → Activate Now
+- Progress bar shows Sign Up → Basic Info → Business → Activate
+- Hero "Start Free Now" button navigates to /join
+- Dashboard/Admin redirect unauthenticated users to /join
 
 ## Admin Panel (/admin)
 - Protected route for admin users only
@@ -200,6 +204,12 @@ Multi-step form after sign-up:
 - View user details (email, phone, business, platforms)
 
 ## Recent Changes
+- Moved sign-up into /join onboarding funnel (Feb 2026)
+  - Sign-up is now step 1 of the funnel (email + password + confirm)
+  - Toggle to "Already have an account? Sign In" at bottom
+  - Hero "Start Free Now" navigates to /join instead of opening auth modal
+  - Dashboard/Admin redirect to /join when not authenticated
+  - 4-step progress: Sign Up → Basic Info → Business → Activate
 - Added user onboarding flow at /join (Feb 2026)
   - Multi-step form: basic info, business info, platform activation
   - Skip option, progress indicators, platform pagination

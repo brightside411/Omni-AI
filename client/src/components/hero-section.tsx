@@ -77,12 +77,12 @@ export function HeroSection({ onBookDemo, onSignIn }: HeroSectionProps) {
               if (user) {
                 setLocation("/dashboard");
               } else {
-                onSignIn?.();
+                setLocation("/join");
               }
             }}
             data-testid="button-start-free"
           >
-            Sign In
+            Start Free Now
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
           <Button

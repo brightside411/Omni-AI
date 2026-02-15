@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  User, Phone, Building2, Briefcase, FileText,
+  User, Phone, Building2, Briefcase, FileText, Mail, Lock, Eye, EyeOff,
   ArrowRight, ArrowLeft, Check, Loader2, SkipForward,
   CircleDot
 } from "lucide-react";
@@ -35,16 +35,22 @@ const platforms = [
   { name: "Apple", icon: SiApple },
 ];
 
-type OnboardingStep = "basic" | "business" | "activation";
+type FunnelStep = "signup" | "basic" | "business" | "activation";
 
 export default function Join() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signUp, signIn } = useAuth();
   const { profile, profileLoading, upsertProfile } = useProfile();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const [step, setStep] = useState<OnboardingStep>("basic");
+  const [step, setStep] = useState<FunnelStep>("signup");
   const [isLoading, setIsLoading] = useState(false);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSignInMode, setIsSignInMode] = useState(false);
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -59,10 +65,10 @@ export default function Join() {
   const [platformPage, setPlatformPage] = useState(0);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      setLocation("/?auth=dashboard");
+    if (!authLoading && user && step === "signup") {
+      setStep("basic");
     }
-  }, [user, authLoading, setLocation]);
+  }, [user, authLoading, step]);
 
   useEffect(() => {
     if (profile) {
@@ -76,6 +82,48 @@ export default function Join() {
     }
   }, [profile]);
 
+  const handleSignUp = async () => {
+    if (!email.trim()) {
+      toast({ title: "Required", description: "Please enter your email address.", variant: "destructive" });
+      return;
+    }
+    if (!password.trim() || password.length < 6) {
+      toast({ title: "Required", description: "Password must be at least 6 characters.", variant: "destructive" });
+      return;
+    }
+    if (!isSignInMode && password !== confirmPassword) {
+      toast({ title: "Mismatch", description: "Passwords do not match.", variant: "destructive" });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      if (isSignInMode) {
+        const { error } = await signIn(email.trim(), password);
+        if (error) {
+          toast({ title: "Sign In Failed", description: error.message, variant: "destructive" });
+          setIsLoading(false);
+          return;
+        }
+        toast({ title: "Welcome back!", description: "Signed in successfully." });
+        setStep("basic");
+      } else {
+        const { error } = await signUp(email.trim(), password);
+        if (error) {
+          toast({ title: "Sign Up Failed", description: error.message, variant: "destructive" });
+          setIsLoading(false);
+          return;
+        }
+        toast({ title: "Account created!", description: "Let's set up your profile." });
+        setStep("basic");
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Something went wrong.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const saveProgress = async () => {
     const data: any = {};
     if (name) data.name = name;
@@ -85,7 +133,7 @@ export default function Join() {
     if (businessNiche) data.business_niche = businessNiche;
     if (businessDetails) data.business_details = businessDetails;
     if (activatedPlatforms.length) data.activated_platforms = activatedPlatforms;
-    
+
     if (Object.keys(data).length > 0) {
       await upsertProfile(data);
     }
@@ -156,18 +204,16 @@ export default function Join() {
     (platformPage + 1) * platformsPerPage
   );
 
-  const stepIndex = step === "basic" ? 0 : step === "business" ? 1 : 2;
-  const steps = ["Sign Up", "Complete Account", "Activate Now"];
+  const stepIndex = step === "signup" ? 0 : step === "basic" ? 1 : step === "business" ? 2 : 3;
+  const steps = ["Sign Up", "Basic Info", "Business", "Activate"];
 
-  if (authLoading || profileLoading) {
+  if (authLoading || (user && profileLoading)) {
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
-
-  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-[#050505] text-white noise-overlay">
@@ -178,15 +224,21 @@ export default function Join() {
             <span className="text-2xl font-bold text-gradient">Omni AI</span>
           </a>
           <h1 className="text-3xl md:text-4xl font-bold text-gradient mb-2" data-testid="text-join-heading">
-            Complete Your Account
+            {step === "signup"
+              ? (isSignInMode ? "Welcome Back" : "Join Omni AI")
+              : "Complete Your Account"}
           </h1>
-          <p className="text-gray-400">Set up your profile to unlock the full Omni AI experience</p>
+          <p className="text-gray-400">
+            {step === "signup"
+              ? (isSignInMode ? "Sign in to continue to your account" : "Create your account to get started")
+              : "Set up your profile to unlock the full Omni AI experience"}
+          </p>
         </div>
 
-        <div className="flex items-center justify-center gap-2 mb-8" data-testid="progress-steps">
+        <div className="flex items-center justify-center gap-1 sm:gap-2 mb-8" data-testid="progress-steps">
           {steps.map((s, i) => (
-            <div key={s} className="flex items-center gap-2">
-              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+            <div key={s} className="flex items-center gap-1 sm:gap-2">
+              <div className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                 i < stepIndex
                   ? "bg-green-500/20 text-green-400 border border-green-500/30"
                   : i === stepIndex
@@ -197,7 +249,7 @@ export default function Join() {
                 <span className="hidden sm:inline">{s}</span>
               </div>
               {i < steps.length - 1 && (
-                <div className={`w-6 h-px ${i < stepIndex ? "bg-green-500/50" : "bg-white/10"}`} />
+                <div className={`w-4 sm:w-6 h-px ${i < stepIndex ? "bg-green-500/50" : "bg-white/10"}`} />
               )}
             </div>
           ))}
@@ -205,6 +257,107 @@ export default function Join() {
 
         <div className="glass-card neon-border rounded-2xl p-6 md:p-8">
           <AnimatePresence mode="wait">
+            {step === "signup" && (
+              <motion.div
+                key="signup"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-xl font-semibold mb-1" data-testid="text-step-signup">
+                  {isSignInMode ? "Sign In" : "Create Account"}
+                </h2>
+                <p className="text-gray-400 text-sm mb-6">
+                  {isSignInMode ? "Enter your credentials" : "Enter your email and create a password"}
+                </p>
+
+                <form onSubmit={(e) => { e.preventDefault(); handleSignUp(); }} className="space-y-4">
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <Input
+                      type="email"
+                      placeholder="Email Address"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 py-5"
+                      data-testid="input-signup-email"
+                      autoComplete="email"
+                    />
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10 pr-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 py-5"
+                      data-testid="input-signup-password"
+                      autoComplete={isSignInMode ? "current-password" : "new-password"}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                      data-testid="button-toggle-password"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                  {!isSignInMode && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="relative"
+                    >
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 py-5"
+                        data-testid="input-signup-confirm-password"
+                        autoComplete="new-password"
+                      />
+                    </motion.div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 border-0 text-white py-5"
+                    disabled={isLoading}
+                    data-testid="button-signup-submit"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>{isSignInMode ? "Sign In" : "Create Account"} <ArrowRight className="w-4 h-4 ml-2" /></>
+                    )}
+                  </Button>
+                </form>
+
+                <div className="text-center mt-6">
+                  <p className="text-gray-500 text-sm">
+                    {isSignInMode ? "Don't have an account?" : "Already have an account?"}{" "}
+                    <button
+                      onClick={() => {
+                        setIsSignInMode(!isSignInMode);
+                        setPassword("");
+                        setConfirmPassword("");
+                      }}
+                      className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
+                      data-testid="button-toggle-auth-mode"
+                    >
+                      {isSignInMode ? "Sign Up" : "Sign In"}
+                    </button>
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
             {step === "basic" && (
               <motion.div
                 key="basic"
@@ -444,7 +597,7 @@ export default function Join() {
                       })}
                     </div>
 
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center justify-between gap-2 mb-4">
                       <Button
                         size="sm"
                         variant="outline"

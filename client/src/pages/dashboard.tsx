@@ -153,7 +153,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (!loading && !user) {
       const timer = setTimeout(() => {
-        setLocation("/?auth=dashboard");
+        setLocation("/join");
       }, 500);
       return () => clearTimeout(timer);
     }
