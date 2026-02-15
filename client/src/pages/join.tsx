@@ -78,6 +78,8 @@ export default function Join() {
   const [activateNow, setActivateNow] = useState<boolean | null>(null);
   const [activatedPlatforms, setActivatedPlatforms] = useState<string[]>([]);
   const [platformPage, setPlatformPage] = useState(0);
+  const [activationPhase, setActivationPhase] = useState<"idle" | "loading" | "showing" | "done">("idle");
+  const [visiblePlatformCount, setVisiblePlatformCount] = useState(0);
 
   const [hasResumed, setHasResumed] = useState(false);
 
@@ -209,6 +211,37 @@ export default function Join() {
     );
   };
 
+  const startActivationSequence = async () => {
+    setActivateNow(true);
+    setActivationPhase("loading");
+    setActivatedPlatforms(platforms.map(p => p.name));
+
+    await new Promise(r => setTimeout(r, 2000));
+
+    setActivationPhase("showing");
+    setVisiblePlatformCount(0);
+
+    const batchSize = 4;
+    const totalBatches = Math.ceil(platforms.length / batchSize);
+
+    for (let i = 1; i <= totalBatches; i++) {
+      await new Promise(r => setTimeout(r, 1200));
+      setVisiblePlatformCount(Math.min(i * batchSize, platforms.length));
+    }
+
+    await new Promise(r => setTimeout(r, 800));
+    setActivationPhase("done");
+
+    await upsertProfile({
+      activated_platforms: platforms.map(p => p.name),
+      onboarding_completed: true,
+    });
+    await signOut();
+
+    await new Promise(r => setTimeout(r, 1500));
+    setStep("complete");
+  };
+
   const handleComplete = async () => {
     setIsLoading(true);
     await upsertProfile({
@@ -219,14 +252,6 @@ export default function Join() {
     setIsLoading(false);
     setStep("complete");
   };
-
-  const allPlatformsActivated = activatedPlatforms.length === platforms.length;
-  const platformsPerPage = 4;
-  const totalPages = Math.ceil(platforms.length / platformsPerPage);
-  const visiblePlatforms = platforms.slice(
-    platformPage * platformsPerPage,
-    (platformPage + 1) * platformsPerPage
-  );
 
   const stepIndex = step === "signup" ? 0 : step === "basic" ? 1 : step === "business" ? 2 : step === "activation" ? 3 : 4;
   const steps = ["Sign Up", "Basic Info", "Business", "Activate"];
@@ -548,156 +573,117 @@ export default function Join() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="text-xl font-semibold mb-1" data-testid="text-step-activation">Activate Now</h2>
-                <p className="text-gray-400 text-sm mb-6">Would you like to connect your platforms?</p>
+                {activationPhase === "idle" && (
+                  <>
+                    <h2 className="text-xl font-semibold mb-1" data-testid="text-step-activation">Activate Platforms</h2>
+                    <p className="text-gray-400 text-sm mb-6">Would you like to activate your platforms now?</p>
 
-                {activateNow === null && (
-                  <div className="flex gap-3 mb-6">
-                    <Button
-                      className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 border-0 text-white"
-                      onClick={() => setActivateNow(true)}
-                      data-testid="button-activate-yes"
-                    >
-                      Yes, Let's Go
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="flex-1 border-white/20 bg-transparent text-gray-400"
-                      onClick={() => {
-                        setActivateNow(false);
-                        handleComplete();
-                      }}
-                      data-testid="button-activate-no"
-                    >
-                      Not Now
-                    </Button>
-                  </div>
-                )}
-
-                {activateNow && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    <div className="flex items-center gap-4 mb-4 text-xs text-gray-400">
-                      <div className="flex items-center gap-1.5">
-                        <CircleDot className="w-3 h-3 text-red-400" />
-                        <span>Configure in dashboard</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <CircleDot className="w-3 h-3 text-green-400" />
-                        <span>Activated</span>
-                      </div>
+                    <div className="flex gap-3 mb-6">
+                      <Button
+                        className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 border-0 text-white"
+                        onClick={startActivationSequence}
+                        data-testid="button-activate-yes"
+                      >
+                        Yes
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-1 border-white/20 bg-transparent text-gray-400"
+                        onClick={handleSkipActivation}
+                        data-testid="button-activate-no"
+                      >
+                        Not Now
+                      </Button>
                     </div>
 
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        className="border-white/20 bg-transparent text-gray-400"
+                        onClick={() => setStep("business")}
+                        data-testid="button-activation-back"
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Back
+                      </Button>
+                    </div>
+                  </>
+                )}
+
+                {activationPhase === "loading" && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center py-12"
+                  >
+                    <Loader2 className="w-10 h-10 text-purple-400 animate-spin mx-auto mb-4" />
+                    <h2 className="text-xl font-semibold mb-2" data-testid="text-activating">Activating...</h2>
+                    <p className="text-gray-400 text-sm">Setting up your platforms</p>
+                  </motion.div>
+                )}
+
+                {activationPhase === "showing" && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <h2 className="text-xl font-semibold mb-1">Platform Status</h2>
+                    <p className="text-gray-400 text-sm mb-4">
+                      {visiblePlatformCount} / {platforms.length} configured
+                    </p>
+
                     <div className="space-y-2 mb-4" data-testid="platform-list">
-                      {visiblePlatforms.map((platform) => {
-                        const isActivated = activatedPlatforms.includes(platform.name);
+                      {platforms.slice(0, visiblePlatformCount).map((platform, index) => {
                         const IconComponent = platform.icon;
                         return (
-                          <button
+                          <motion.div
                             key={platform.name}
-                            onClick={() => handleTogglePlatform(platform.name)}
-                            className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${
-                              isActivated
-                                ? "border-green-500/30 bg-green-500/10"
-                                : "border-white/10 bg-white/5 hover:border-white/20"
-                            }`}
-                            data-testid={`button-platform-${platform.name.toLowerCase()}`}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3, delay: (index % 4) * 0.1 }}
+                            className="w-full flex items-center gap-3 p-3 rounded-lg border border-green-500/30 bg-green-500/10"
+                            data-testid={`platform-status-${platform.name.toLowerCase()}`}
                           >
-                            <CircleDot className={`w-3 h-3 flex-shrink-0 ${isActivated ? "text-green-400" : "text-red-400"}`} />
+                            <Check className="w-4 h-4 flex-shrink-0 text-green-400" />
                             {IconComponent && <IconComponent className="w-5 h-5 text-gray-300" />}
                             <span className="text-sm font-medium text-gray-200">{platform.name}</span>
-                            {isActivated && <Check className="w-4 h-4 text-green-400 ml-auto" />}
-                          </button>
+                            <span className="text-xs text-green-400 ml-auto">Activated</span>
+                          </motion.div>
                         );
                       })}
                     </div>
 
-                    <div className="flex items-center justify-between gap-2 mb-4">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-white/20 bg-transparent text-gray-400"
-                        onClick={() => setPlatformPage(Math.max(0, platformPage - 1))}
-                        disabled={platformPage === 0}
-                        data-testid="button-platform-prev"
-                      >
-                        <ArrowLeft className="w-3 h-3" />
-                      </Button>
-                      <span className="text-xs text-gray-500">
-                        {activatedPlatforms.length} / {platforms.length} activated
-                      </span>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-white/20 bg-transparent text-gray-400"
-                        onClick={() => setPlatformPage(Math.min(totalPages - 1, platformPage + 1))}
-                        disabled={platformPage >= totalPages - 1}
-                        data-testid="button-platform-next"
-                      >
-                        <ArrowRight className="w-3 h-3" />
-                      </Button>
-                    </div>
-
-                    <div className="flex gap-1 justify-center mb-6">
-                      {Array.from({ length: totalPages }).map((_, i) => (
-                        <button
+                    <div className="flex gap-1 justify-center">
+                      {Array.from({ length: Math.ceil(platforms.length / 4) }).map((_, i) => (
+                        <div
                           key={i}
-                          onClick={() => setPlatformPage(i)}
                           className={`w-2 h-2 rounded-full transition-all ${
-                            i === platformPage ? "bg-purple-500 w-4" : "bg-white/20"
+                            i < Math.ceil(visiblePlatformCount / 4) ? "bg-green-500 w-4" : "bg-white/20"
                           }`}
-                          data-testid={`button-platform-page-${i}`}
                         />
                       ))}
                     </div>
                   </motion.div>
                 )}
 
-                <div className="flex gap-3 mt-4">
-                  <Button
-                    variant="outline"
-                    className="border-white/20 bg-transparent text-gray-400"
-                    onClick={() => { setStep("business"); setActivateNow(null); }}
-                    data-testid="button-activation-back"
+                {activationPhase === "done" && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-8"
                   >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back
-                  </Button>
-                  {activateNow && (
-                    <>
-                      <Button
-                        variant="outline"
-                        className="border-white/20 bg-transparent text-gray-400"
-                        onClick={handleSkipActivation}
-                        disabled={isLoading}
-                        data-testid="button-skip-activation"
-                      >
-                        <SkipForward className="w-4 h-4 mr-2" />
-                        Skip
-                      </Button>
-                      <Button
-                        className={`flex-1 border-0 text-white ${
-                          allPlatformsActivated
-                            ? "bg-gradient-to-r from-green-500 to-emerald-500"
-                            : "bg-gradient-to-r from-purple-600 to-blue-600"
-                        }`}
-                        onClick={handleComplete}
-                        disabled={isLoading}
-                        data-testid="button-complete"
-                      >
-                        {isLoading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : allPlatformsActivated ? (
-                          <>Activation Complete <Check className="w-4 h-4 ml-2" /></>
-                        ) : (
-                          <>Complete Setup <ArrowRight className="w-4 h-4 ml-2" /></>
-                        )}
-                      </Button>
-                    </>
-                  )}
-                </div>
+                    <div className="w-16 h-16 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center mx-auto mb-4">
+                      <Check className="w-8 h-8 text-green-400" />
+                    </div>
+                    <h2 className="text-xl font-semibold mb-2" data-testid="text-activation-complete">
+                      All Platforms Activated
+                    </h2>
+                    <p className="text-gray-400 text-sm">
+                      {platforms.length} / {platforms.length} configured
+                    </p>
+                    <Loader2 className="w-5 h-5 text-purple-400 animate-spin mx-auto mt-4" />
+                  </motion.div>
+                )}
               </motion.div>
             )}
 
