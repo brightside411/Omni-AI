@@ -239,7 +239,7 @@ export default function Join() {
     await signOut();
 
     await new Promise(r => setTimeout(r, 1500));
-    setStep("complete");
+    setLocation("/?signin=true&complete=true");
   };
 
   const handleComplete = async () => {
@@ -250,7 +250,7 @@ export default function Join() {
     });
     await signOut();
     setIsLoading(false);
-    setStep("complete");
+    setLocation("/?signin=true&complete=true");
   };
 
   const stepIndex = step === "signup" ? 0 : step === "basic" ? 1 : step === "business" ? 2 : step === "activation" ? 3 : 4;
@@ -687,32 +687,6 @@ export default function Join() {
               </motion.div>
             )}
 
-            {step === "complete" && (
-              <motion.div
-                key="complete"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4 }}
-                className="text-center py-8"
-              >
-                <div className="w-16 h-16 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center mx-auto mb-6">
-                  <Check className="w-8 h-8 text-green-400" />
-                </div>
-                <h2 className="text-2xl font-bold text-gradient mb-2" data-testid="text-profile-complete">
-                  Profile Complete
-                </h2>
-                <p className="text-gray-400 mb-8">
-                  Your account is all set up. Sign in to access your dashboard.
-                </p>
-                <Button
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 border-0 text-white px-8 py-5"
-                  onClick={() => setLocation("/?signin=true")}
-                  data-testid="button-goto-signin-after-complete"
-                >
-                  Sign In <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </motion.div>
-            )}
           </AnimatePresence>
         </div>
       </div>

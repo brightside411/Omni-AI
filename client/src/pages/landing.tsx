@@ -19,6 +19,7 @@ export default function Landing() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authPrompt, setAuthPrompt] = useState<string | undefined>();
 
+  const [showCompleteBanner, setShowCompleteBanner] = useState(false);
   const [, setLocation] = useLocation();
 
   const openAuthWithPrompt = (prompt?: string) => {
@@ -30,6 +31,9 @@ export default function Landing() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("signin") === "true") {
       setIsAuthModalOpen(true);
+      if (params.get("complete") === "true") {
+        setShowCompleteBanner(true);
+      }
       window.history.replaceState({}, "", "/");
     }
   }, []);
@@ -66,8 +70,10 @@ export default function Landing() {
         onClose={() => {
           setIsAuthModalOpen(false);
           setAuthPrompt(undefined);
+          setShowCompleteBanner(false);
         }}
         prompt={authPrompt}
+        showCompleteBanner={showCompleteBanner}
       />
     </div>
   );

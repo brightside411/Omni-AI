@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Mail, Lock, Loader2 } from "lucide-react";
+import { X, Mail, Lock, Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
@@ -11,9 +11,10 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   prompt?: string;
+  showCompleteBanner?: boolean;
 }
 
-export function AuthModal({ isOpen, onClose, prompt }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, prompt, showCompleteBanner }: AuthModalProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -81,17 +82,32 @@ export function AuthModal({ isOpen, onClose, prompt }: AuthModalProps) {
               <X className="w-5 h-5" />
             </button>
 
+            {showCompleteBanner && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-3 p-3 rounded-lg border border-green-500/30 bg-green-500/10 mb-5"
+                data-testid="banner-profile-complete"
+              >
+                <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                <div className="text-left">
+                  <p className="text-sm font-medium text-green-300">Profile Complete</p>
+                  <p className="text-xs text-green-400/70">Sign in to access your dashboard</p>
+                </div>
+              </motion.div>
+            )}
+
             <div className="text-center mb-6">
               <h2 className="text-2xl md:text-3xl font-bold text-gradient mb-2" data-testid="text-auth-heading">
                 Welcome Back
               </h2>
               {prompt ? (
                 <p className="text-gray-400 text-sm" data-testid="text-auth-prompt">{prompt}</p>
-              ) : (
+              ) : !showCompleteBanner ? (
                 <p className="text-gray-400 text-sm">
                   Sign in to access your account
                 </p>
-              )}
+              ) : null}
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
