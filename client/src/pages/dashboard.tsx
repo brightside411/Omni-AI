@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
+import { useProfile } from "@/hooks/use-profile";
 import { CursorSpotlight } from "@/components/cursor-spotlight";
 
 const tierInfo: Record<string, { name: string; icon: typeof Zap; gradient: string; accent: string; level: number }> = {
@@ -131,6 +132,7 @@ interface DemoBooking {
 
 export default function Dashboard() {
   const { user, loading, signOut } = useAuth();
+  const { profile, profileLoading, isAdmin, onboardingComplete } = useProfile();
   const [, setLocation] = useLocation();
   const [campaignFilter, setCampaignFilter] = useState<"all" | CampaignStatus>("all");
   const currentTier = "apprentice";
@@ -194,6 +196,18 @@ export default function Dashboard() {
           </Link>
 
           <div className="flex items-center gap-3">
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-orange-500/20 bg-orange-500/5 text-orange-400"
+                onClick={() => setLocation("/admin")}
+                data-testid="button-admin-panel"
+              >
+                <Shield className="w-3 h-3 mr-1.5" />
+                Admin
+              </Button>
+            )}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10" data-testid="badge-tier-status">
               <TierIcon className={`w-4 h-4 ${currentTierData.accent}`} />
               <span className="text-sm text-gray-300" data-testid="text-tier-badge">{currentTierData.name} Tier</span>
@@ -216,6 +230,33 @@ export default function Dashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        {!onboardingComplete && profile && (
+          <motion.div {...fadeUp} transition={{ duration: 0.3 }}>
+            <div
+              className="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20"
+              data-testid="banner-complete-account"
+            >
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white">Complete your account setup</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {!profile.name || !profile.phone
+                    ? "Add your name and phone number to get started."
+                    : "Finish setting up your platforms to unlock the full experience."}
+                </p>
+              </div>
+              <Button
+                size="sm"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 border-0 text-white"
+                onClick={() => setLocation("/join")}
+                data-testid="button-complete-setup"
+              >
+                Complete Setup
+                <ArrowRight className="w-3 h-3 ml-1.5" />
+              </Button>
+            </div>
+          </motion.div>
+        )}
+
         <motion.div {...fadeUp} transition={{ duration: 0.4 }}>
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
             <div>

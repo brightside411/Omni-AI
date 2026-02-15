@@ -1,0 +1,198 @@
+FEATURE IMPLEMENTATION SPEC — USER & ADMIN + ONBOARDING
+✅ 1 — Role Management & Admin Access
+Supabase Schema Update
+Update your users table:
+
+ALTER TABLE users
+ADD COLUMN role TEXT DEFAULT 'user';
+Mark the admin:
+
+UPDATE users
+SET role = 'admin'
+WHERE email = 'sitanim6@gmail.com';
+
+✅ 2 — Protect Routes Based on Role
+In your Next.js auth middleware:
+
+import { withPageAuth } from '@supabase/auth-helpers-nextjs';
+
+export default withPageAuth({
+  redirectTo: '/login'
+});
+Then enforce admin auth on /admin:
+
+export async function getServerSideProps({ req }) {
+  const { user } = await supabase.auth.api.getUserByCookie(req);
+  if (user?.role !== 'admin') {
+    return { redirect: { destination: '/', permanent: false } };
+  }
+  return { props: {} };
+}
+
+✅ 3 — Landing Page (instead of /landingpage)
+Use route:
+
+/join
+Replace old landing routes in router config.
+
+✅ 4 — Onboarding Form Flow
+Signup Form (Step 1)
+Structure:
+⚡ Email ⚡ Password [Submit]
+On submit:
+
+await supabase.auth.signUp({ email, password });
+Then redirect to:
+
+/join
+
+Step 2 (On /join) — Progressive Form
+The form has steps:
+Step A — Basic Info
+
+<input placeholder="Name" required />
+<input placeholder="Phone" required />
+Step B — Business Owner
+
+<label>Are you a business owner?</label>
+<button onClick={() => setBusiness(true)}>Yes</button>
+<button onClick={() => setBusiness(false)}>No</button>
+If business === true, show:
+
+<input placeholder="Business Name" required />
+<input placeholder="Business Niche" required />
+<textarea placeholder="Business Details" />
+Save to Supabase:
+
+await supabase
+  .from('users')
+  .update({
+    name,
+    phone,
+    business_owner: business,
+    business_name,
+    business_niche,
+    business_details
+  })
+  .eq('id', user.id);
+
+✅ 5 — “Skip” Feature
+Anywhere on the onboarding form:
+
+<button onClick={() => router.push('/dashboard')}>
+  Skip & Go to Dashboard
+</button>
+This should still save whatever info exists before navigation.
+
+🎯 6 — Activation Step — YES / NO + Platforms UI
+Add after onboarding fields:
+
+Activation Prompt UI
+
+<label>Activate Now?</label>
+<button onClick={() => setActivateNow(true)}>Yes</button>
+<button onClick={() => setActivateNow(false)}>No</button>
+If activateNow:
+Render a scrollable list of platforms:
+
+Platforms Array
+
+const platforms = [
+  "TikTok",
+  "Facebook",
+  "YouTube",
+  "Instagram",
+  "LinkedIn",
+  "X",
+  "Snapchat",
+  "Slack",
+  "Telegram",
+  "WhatsApp",
+  "Newsletter",
+  "Google",
+  "Discord",
+  "ChatGPT",
+  "Spotify",
+  "Zoom",
+  "GitHub",
+  "Apple"
+];
+Render 4 at a time:
+
+{platforms.slice(index, index+4).map(platform => (
+  <PlatformCard name={platform} />
+))}
+Each item:
+
+const PlatformCard = ({ name }) => (
+  <div className="flex items-center gap-2">
+    <span className="dot red"></span>
+    <p>{name}</p>
+  </div>
+);
+Add legend:
+
+🔴 Configure in dashboard
+🟢 Activated
+Once all 18 platforms become green:
+
+<button>Activation Complete</button>
+Store activated state in Supabase:
+
+await supabase
+  .from('users')
+  .update({ activated_platforms: platforms })
+  .eq('id', user.id);
+
+✔ 7 — Form Submit Loading States
+Wrap each async action in a loading UI:
+
+{isLoading && <Loader />}
+Use a 3-step progress bar:
+
+[Step 1] Sign Up → [Step 2] Complete Account → [Step 3] Activate Now
+Update real-time as each part saves.
+
+✔ 8 — Dashboard Redirect After Signup
+After user finishes /join:
+
+router.push('/dashboard');
+Ensure dashboard.js checks:
+
+const { user } = await supabase.auth.getUser();
+if (!user) router.push('/login');
+
+🎯 9 — Complete Account Prompt in Profile
+On /profile:
+
+{!user.name || !user.phone ? (
+  <Link href="/join">Complete Account Setup</Link>
+) : null}
+This reminds users to finish onboarding.
+
+🛡️ 10 — Admin Portal (/admin)
+Render admin interface:
+
+<h1>Admin Panel</h1>
+
+<table>
+  {users.map(u => (
+    <tr>
+      <td>{u.email}</td>
+      <td>{u.role}</td>
+      <td>
+        <button onClick={() => makeAdmin(u.id)}>Make Admin</button>
+      </td>
+    </tr>
+  ))}
+</table>
+Admin actions:
+
+const makeAdmin = async (id) =>
+  await supabase
+    .from('users')
+    .update({ role: 'admin' })
+    .eq('id', id);
+
+✅ Summary of Required Code Tasks
+✔ Distinguish admin from user on protected routes ✔ Add Supabase role field & admin user ✔ Modify onboarding flow at /join ✔ Conditional business fields ✔ “Skip” onboarding option ✔ Activation UI with 4 platforms at a time logic ✔ Save all inputs progressively to Supabase ✔ Redirect to /dashboard ✔ Complete account prompts ✔ Admin panel to manage users

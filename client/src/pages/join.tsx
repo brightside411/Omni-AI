@@ -1,0 +1,538 @@
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  User, Phone, Building2, Briefcase, FileText,
+  ArrowRight, ArrowLeft, Check, Loader2, SkipForward,
+  CircleDot
+} from "lucide-react";
+import { SiTiktok, SiFacebook, SiYoutube, SiInstagram, SiLinkedin, SiX, SiSnapchat, SiSlack, SiTelegram, SiWhatsapp, SiGoogle, SiDiscord, SiSpotify, SiZoom, SiGithub, SiApple } from "react-icons/si";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/use-auth";
+import { useProfile } from "@/hooks/use-profile";
+import { useToast } from "@/hooks/use-toast";
+import { CursorSpotlight } from "@/components/cursor-spotlight";
+
+const platforms = [
+  { name: "TikTok", icon: SiTiktok },
+  { name: "Facebook", icon: SiFacebook },
+  { name: "YouTube", icon: SiYoutube },
+  { name: "Instagram", icon: SiInstagram },
+  { name: "LinkedIn", icon: SiLinkedin },
+  { name: "X", icon: SiX },
+  { name: "Snapchat", icon: SiSnapchat },
+  { name: "Slack", icon: SiSlack },
+  { name: "Telegram", icon: SiTelegram },
+  { name: "WhatsApp", icon: SiWhatsapp },
+  { name: "Newsletter", icon: null },
+  { name: "Google", icon: SiGoogle },
+  { name: "Discord", icon: SiDiscord },
+  { name: "ChatGPT", icon: null },
+  { name: "Spotify", icon: SiSpotify },
+  { name: "Zoom", icon: SiZoom },
+  { name: "GitHub", icon: SiGithub },
+  { name: "Apple", icon: SiApple },
+];
+
+type OnboardingStep = "basic" | "business" | "activation";
+
+export default function Join() {
+  const { user, loading: authLoading } = useAuth();
+  const { profile, profileLoading, upsertProfile } = useProfile();
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+
+  const [step, setStep] = useState<OnboardingStep>("basic");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+
+  const [businessOwner, setBusinessOwner] = useState<boolean | null>(null);
+  const [businessName, setBusinessName] = useState("");
+  const [businessNiche, setBusinessNiche] = useState("");
+  const [businessDetails, setBusinessDetails] = useState("");
+
+  const [activateNow, setActivateNow] = useState<boolean | null>(null);
+  const [activatedPlatforms, setActivatedPlatforms] = useState<string[]>([]);
+  const [platformPage, setPlatformPage] = useState(0);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      setLocation("/?auth=dashboard");
+    }
+  }, [user, authLoading, setLocation]);
+
+  useEffect(() => {
+    if (profile) {
+      if (profile.name) setName(profile.name);
+      if (profile.phone) setPhone(profile.phone);
+      setBusinessOwner(profile.business_owner || null);
+      if (profile.business_name) setBusinessName(profile.business_name);
+      if (profile.business_niche) setBusinessNiche(profile.business_niche);
+      if (profile.business_details) setBusinessDetails(profile.business_details);
+      if (profile.activated_platforms?.length) setActivatedPlatforms(profile.activated_platforms);
+    }
+  }, [profile]);
+
+  const saveProgress = async () => {
+    const data: any = {};
+    if (name) data.name = name;
+    if (phone) data.phone = phone;
+    if (businessOwner !== null) data.business_owner = businessOwner;
+    if (businessName) data.business_name = businessName;
+    if (businessNiche) data.business_niche = businessNiche;
+    if (businessDetails) data.business_details = businessDetails;
+    if (activatedPlatforms.length) data.activated_platforms = activatedPlatforms;
+    
+    if (Object.keys(data).length > 0) {
+      await upsertProfile(data);
+    }
+  };
+
+  const handleSkip = async () => {
+    setIsLoading(true);
+    await saveProgress();
+    setIsLoading(false);
+    setLocation("/dashboard");
+  };
+
+  const handleBasicNext = async () => {
+    if (!name.trim() || !phone.trim()) {
+      toast({ title: "Required", description: "Please fill in your name and phone number.", variant: "destructive" });
+      return;
+    }
+    setIsLoading(true);
+    await upsertProfile({ name: name.trim(), phone: phone.trim() });
+    setIsLoading(false);
+    setStep("business");
+  };
+
+  const handleBusinessNext = async () => {
+    if (businessOwner === null) {
+      toast({ title: "Required", description: "Please select whether you are a business owner.", variant: "destructive" });
+      return;
+    }
+    if (businessOwner && !businessName.trim()) {
+      toast({ title: "Required", description: "Please enter your business name.", variant: "destructive" });
+      return;
+    }
+    setIsLoading(true);
+    await upsertProfile({
+      business_owner: businessOwner,
+      business_name: businessOwner ? businessName.trim() : null,
+      business_niche: businessOwner ? businessNiche.trim() : null,
+      business_details: businessOwner ? businessDetails.trim() : null,
+    });
+    setIsLoading(false);
+    setStep("activation");
+  };
+
+  const handleTogglePlatform = (platformName: string) => {
+    setActivatedPlatforms(prev =>
+      prev.includes(platformName)
+        ? prev.filter(p => p !== platformName)
+        : [...prev, platformName]
+    );
+  };
+
+  const handleComplete = async () => {
+    setIsLoading(true);
+    await upsertProfile({
+      activated_platforms: activatedPlatforms,
+      onboarding_completed: true,
+    });
+    setIsLoading(false);
+    toast({ title: "Welcome to Omni AI!", description: "Your account setup is complete." });
+    setLocation("/dashboard");
+  };
+
+  const allPlatformsActivated = activatedPlatforms.length === platforms.length;
+  const platformsPerPage = 4;
+  const totalPages = Math.ceil(platforms.length / platformsPerPage);
+  const visiblePlatforms = platforms.slice(
+    platformPage * platformsPerPage,
+    (platformPage + 1) * platformsPerPage
+  );
+
+  const stepIndex = step === "basic" ? 0 : step === "business" ? 1 : 2;
+  const steps = ["Sign Up", "Complete Account", "Activate Now"];
+
+  if (authLoading || profileLoading) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
+  return (
+    <div className="min-h-screen bg-[#050505] text-white noise-overlay">
+      <CursorSpotlight />
+      <div className="max-w-xl mx-auto px-4 py-12">
+        <div className="text-center mb-8">
+          <a href="/" className="inline-block mb-6" data-testid="link-join-home">
+            <span className="text-2xl font-bold text-gradient">Omni AI</span>
+          </a>
+          <h1 className="text-3xl md:text-4xl font-bold text-gradient mb-2" data-testid="text-join-heading">
+            Complete Your Account
+          </h1>
+          <p className="text-gray-400">Set up your profile to unlock the full Omni AI experience</p>
+        </div>
+
+        <div className="flex items-center justify-center gap-2 mb-8" data-testid="progress-steps">
+          {steps.map((s, i) => (
+            <div key={s} className="flex items-center gap-2">
+              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                i < stepIndex
+                  ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                  : i === stepIndex
+                    ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                    : "bg-white/5 text-gray-500 border border-white/10"
+              }`}>
+                {i < stepIndex ? <Check className="w-3 h-3" /> : <span>{i + 1}</span>}
+                <span className="hidden sm:inline">{s}</span>
+              </div>
+              {i < steps.length - 1 && (
+                <div className={`w-6 h-px ${i < stepIndex ? "bg-green-500/50" : "bg-white/10"}`} />
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="glass-card neon-border rounded-2xl p-6 md:p-8">
+          <AnimatePresence mode="wait">
+            {step === "basic" && (
+              <motion.div
+                key="basic"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-xl font-semibold mb-1" data-testid="text-step-basic">Basic Info</h2>
+                <p className="text-gray-400 text-sm mb-6">Tell us a bit about yourself</p>
+
+                <div className="space-y-4">
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <Input
+                      placeholder="Full Name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 py-5"
+                      data-testid="input-name"
+                    />
+                  </div>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <Input
+                      placeholder="Phone Number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 py-5"
+                      data-testid="input-phone"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 mt-6">
+                  <Button
+                    variant="outline"
+                    className="border-white/20 bg-transparent text-gray-400"
+                    onClick={handleSkip}
+                    disabled={isLoading}
+                    data-testid="button-skip"
+                  >
+                    <SkipForward className="w-4 h-4 mr-2" />
+                    Skip
+                  </Button>
+                  <Button
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 border-0 text-white"
+                    onClick={handleBasicNext}
+                    disabled={isLoading}
+                    data-testid="button-basic-next"
+                  >
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Next <ArrowRight className="w-4 h-4 ml-2" /></>}
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {step === "business" && (
+              <motion.div
+                key="business"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-xl font-semibold mb-1" data-testid="text-step-business">Business Info</h2>
+                <p className="text-gray-400 text-sm mb-6">Are you a business owner?</p>
+
+                <div className="flex gap-3 mb-6">
+                  <Button
+                    variant={businessOwner === true ? "default" : "outline"}
+                    className={businessOwner === true
+                      ? "flex-1 bg-gradient-to-r from-purple-600 to-blue-600 border-0 text-white"
+                      : "flex-1 border-white/20 bg-transparent text-gray-400"}
+                    onClick={() => setBusinessOwner(true)}
+                    data-testid="button-business-yes"
+                  >
+                    Yes
+                  </Button>
+                  <Button
+                    variant={businessOwner === false ? "default" : "outline"}
+                    className={businessOwner === false
+                      ? "flex-1 bg-gradient-to-r from-purple-600 to-blue-600 border-0 text-white"
+                      : "flex-1 border-white/20 bg-transparent text-gray-400"}
+                    onClick={() => setBusinessOwner(false)}
+                    data-testid="button-business-no"
+                  >
+                    No
+                  </Button>
+                </div>
+
+                <AnimatePresence>
+                  {businessOwner && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="space-y-4 mb-6"
+                    >
+                      <div className="relative">
+                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                        <Input
+                          placeholder="Business Name"
+                          value={businessName}
+                          onChange={(e) => setBusinessName(e.target.value)}
+                          className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 py-5"
+                          data-testid="input-business-name"
+                        />
+                      </div>
+                      <div className="relative">
+                        <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                        <Input
+                          placeholder="Business Niche"
+                          value={businessNiche}
+                          onChange={(e) => setBusinessNiche(e.target.value)}
+                          className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 py-5"
+                          data-testid="input-business-niche"
+                        />
+                      </div>
+                      <div className="relative">
+                        <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                        <textarea
+                          placeholder="Business Details (optional)"
+                          value={businessDetails}
+                          onChange={(e) => setBusinessDetails(e.target.value)}
+                          className="w-full min-h-[100px] pl-10 pt-3 bg-white/5 border border-white/10 rounded-md text-white placeholder:text-gray-500 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                          data-testid="input-business-details"
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <div className="flex gap-3 mt-6">
+                  <Button
+                    variant="outline"
+                    className="border-white/20 bg-transparent text-gray-400"
+                    onClick={() => setStep("basic")}
+                    data-testid="button-business-back"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-white/20 bg-transparent text-gray-400"
+                    onClick={handleSkip}
+                    disabled={isLoading}
+                    data-testid="button-skip-business"
+                  >
+                    <SkipForward className="w-4 h-4 mr-2" />
+                    Skip
+                  </Button>
+                  <Button
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 border-0 text-white"
+                    onClick={handleBusinessNext}
+                    disabled={isLoading}
+                    data-testid="button-business-next"
+                  >
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Next <ArrowRight className="w-4 h-4 ml-2" /></>}
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {step === "activation" && (
+              <motion.div
+                key="activation"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-xl font-semibold mb-1" data-testid="text-step-activation">Activate Now</h2>
+                <p className="text-gray-400 text-sm mb-6">Would you like to connect your platforms?</p>
+
+                {activateNow === null && (
+                  <div className="flex gap-3 mb-6">
+                    <Button
+                      className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 border-0 text-white"
+                      onClick={() => setActivateNow(true)}
+                      data-testid="button-activate-yes"
+                    >
+                      Yes, Let's Go
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1 border-white/20 bg-transparent text-gray-400"
+                      onClick={() => {
+                        setActivateNow(false);
+                        handleComplete();
+                      }}
+                      data-testid="button-activate-no"
+                    >
+                      Not Now
+                    </Button>
+                  </div>
+                )}
+
+                {activateNow && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <div className="flex items-center gap-4 mb-4 text-xs text-gray-400">
+                      <div className="flex items-center gap-1.5">
+                        <CircleDot className="w-3 h-3 text-red-400" />
+                        <span>Configure in dashboard</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <CircleDot className="w-3 h-3 text-green-400" />
+                        <span>Activated</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 mb-4" data-testid="platform-list">
+                      {visiblePlatforms.map((platform) => {
+                        const isActivated = activatedPlatforms.includes(platform.name);
+                        const IconComponent = platform.icon;
+                        return (
+                          <button
+                            key={platform.name}
+                            onClick={() => handleTogglePlatform(platform.name)}
+                            className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                              isActivated
+                                ? "border-green-500/30 bg-green-500/10"
+                                : "border-white/10 bg-white/5 hover:border-white/20"
+                            }`}
+                            data-testid={`button-platform-${platform.name.toLowerCase()}`}
+                          >
+                            <CircleDot className={`w-3 h-3 flex-shrink-0 ${isActivated ? "text-green-400" : "text-red-400"}`} />
+                            {IconComponent && <IconComponent className="w-5 h-5 text-gray-300" />}
+                            <span className="text-sm font-medium text-gray-200">{platform.name}</span>
+                            {isActivated && <Check className="w-4 h-4 text-green-400 ml-auto" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="flex items-center justify-between mb-4">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-white/20 bg-transparent text-gray-400"
+                        onClick={() => setPlatformPage(Math.max(0, platformPage - 1))}
+                        disabled={platformPage === 0}
+                        data-testid="button-platform-prev"
+                      >
+                        <ArrowLeft className="w-3 h-3" />
+                      </Button>
+                      <span className="text-xs text-gray-500">
+                        {activatedPlatforms.length} / {platforms.length} activated
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-white/20 bg-transparent text-gray-400"
+                        onClick={() => setPlatformPage(Math.min(totalPages - 1, platformPage + 1))}
+                        disabled={platformPage >= totalPages - 1}
+                        data-testid="button-platform-next"
+                      >
+                        <ArrowRight className="w-3 h-3" />
+                      </Button>
+                    </div>
+
+                    <div className="flex gap-1 justify-center mb-6">
+                      {Array.from({ length: totalPages }).map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setPlatformPage(i)}
+                          className={`w-2 h-2 rounded-full transition-all ${
+                            i === platformPage ? "bg-purple-500 w-4" : "bg-white/20"
+                          }`}
+                          data-testid={`button-platform-page-${i}`}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                <div className="flex gap-3 mt-4">
+                  <Button
+                    variant="outline"
+                    className="border-white/20 bg-transparent text-gray-400"
+                    onClick={() => { setStep("business"); setActivateNow(null); }}
+                    data-testid="button-activation-back"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back
+                  </Button>
+                  {activateNow && (
+                    <>
+                      <Button
+                        variant="outline"
+                        className="border-white/20 bg-transparent text-gray-400"
+                        onClick={handleSkip}
+                        disabled={isLoading}
+                        data-testid="button-skip-activation"
+                      >
+                        <SkipForward className="w-4 h-4 mr-2" />
+                        Skip
+                      </Button>
+                      <Button
+                        className={`flex-1 border-0 text-white ${
+                          allPlatformsActivated
+                            ? "bg-gradient-to-r from-green-500 to-emerald-500"
+                            : "bg-gradient-to-r from-purple-600 to-blue-600"
+                        }`}
+                        onClick={handleComplete}
+                        disabled={isLoading}
+                        data-testid="button-complete"
+                      >
+                        {isLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : allPlatformsActivated ? (
+                          <>Activation Complete <Check className="w-4 h-4 ml-2" /></>
+                        ) : (
+                          <>Complete Setup <ArrowRight className="w-4 h-4 ml-2" /></>
+                        )}
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}

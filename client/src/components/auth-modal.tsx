@@ -40,9 +40,11 @@ export function AuthModal({ isOpen, onClose, prompt }: AuthModalProps) {
       } else {
         if (mode === "signup") {
           toast({
-            title: "Check your email",
-            description: "We sent you a confirmation link to verify your account.",
+            title: "Account created!",
+            description: "Let's complete your profile.",
           });
+          onClose();
+          setLocation("/join");
         } else {
           toast({
             title: "Welcome back!",

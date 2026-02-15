@@ -139,9 +139,14 @@ client/
       ecosystem-section.tsx   # Flow visualization
       contact-section.tsx     # Waitlist form
       footer.tsx              # Site footer
+    hooks/
+      use-auth.tsx            # Supabase auth context/hook
+      use-profile.tsx         # Profile CRUD + role management hook
     pages/
       landing.tsx             # Main landing page
       dashboard.tsx           # Authenticated user dashboard
+      join.tsx                # Onboarding multi-step form
+      admin.tsx               # Admin user management panel
       details.tsx             # Infographic page
     index.css                 # Global styles with custom utilities
 server/
@@ -165,7 +170,50 @@ The app runs on port 5000 using the "Start application" workflow:
 npm run dev
 ```
 
+## Supabase Profiles Table
+The app uses a `profiles` table in Supabase for user data, roles, and onboarding status.
+The table is auto-created on first user profile access. Required columns:
+- id (UUID, references auth.users)
+- email, role (default 'user'), name, phone
+- business_owner, business_name, business_niche, business_details
+- activated_platforms (text array), onboarding_completed (boolean)
+
+Admin user: sitanim6@gmail.com (auto-assigned admin role on profile creation)
+
+## User Roles & Access
+- **user**: Default role, access to /dashboard and /join
+- **admin**: Access to /admin panel for user management
+- Role managed via `useProfile` hook (client/src/hooks/use-profile.tsx)
+
+## Onboarding Flow (/join)
+Multi-step form after sign-up:
+1. Basic Info (name, phone)
+2. Business Info (yes/no business owner, conditional fields)
+3. Platform Activation (18 platforms, 4 shown at a time, toggle on/off)
+- Skip option saves partial data and goes to /dashboard
+- Progress bar shows Sign Up → Complete Account → Activate Now
+
+## Admin Panel (/admin)
+- Protected route for admin users only
+- View all users with stats (total, admins, onboarded)
+- Promote/demote users to/from admin role
+- View user details (email, phone, business, platforms)
+
 ## Recent Changes
+- Added user onboarding flow at /join (Feb 2026)
+  - Multi-step form: basic info, business info, platform activation
+  - Skip option, progress indicators, platform pagination
+  - Saves to Supabase profiles table
+- Added admin panel at /admin (Feb 2026)
+  - User management, role promotion, stats cards
+  - Admin-only access with role-based routing
+- Added Supabase profiles system (Feb 2026)
+  - useProfile hook for profile CRUD
+  - Auto-creates profile on first sign-in
+  - Role-based access control (admin/user)
+- Dashboard shows onboarding completion banner (Feb 2026)
+- Sign-up now redirects to /join for onboarding (Feb 2026)
+- Fixed auth race condition on dashboard redirect (Feb 2026)
 - Added authenticated Dashboard at /dashboard (Feb 2026)
   - Metrics cards, tier status with progress bar, quick actions grid
   - Demo bookings section (fetches from /api/demo-booking)
