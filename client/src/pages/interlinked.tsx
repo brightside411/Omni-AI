@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle, Clock, Mail, Shield, Brain, Zap, AlertTriangle } from "lucide-react";
+import { ArrowRight, CheckCircle, Clock, Mail, Shield, Brain, Zap, AlertTriangle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BookDemoModal } from "@/components/book-demo-modal";
 import { WebinarRegistrationModal } from "@/components/webinar-registration-modal";
@@ -149,8 +149,9 @@ export default function Interlinked() {
           transition={{ duration: 0.6 }}
           className="text-center mb-6"
         >
-          <a href="/" className="inline-block mb-8" data-testid="link-home">
-            <span className="text-2xl font-bold text-gradient">Omni AI</span>
+          <a href="/" className="inline-flex items-center gap-2 px-3 md:px-4 py-2 mb-6 md:mb-8 rounded-full glass-card neon-border" data-testid="link-home">
+            <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-purple-400 flex-shrink-0" />
+            <span className="text-xs md:text-sm text-gray-300 whitespace-nowrap">Omni AI introducing Interlinked</span>
           </a>
           <h1 className="text-5xl md:text-6xl font-bold mb-4">
             <span className="text-gradient">INTERLINKED</span>
