@@ -12,7 +12,7 @@ A high-end, dark-luxury, conversion-focused marketing website for Omni Leads LLC
 - **Animation:** Framer Motion
 - **Icons:** lucide-react
 - **Backend:** Express.js
-- **Storage:** In-memory (MemStorage)
+- **Storage:** Supabase PostgreSQL (demo bookings, waitlist) + In-memory (users)
 
 ## Design System
 - **Theme:** Dark mode ONLY
