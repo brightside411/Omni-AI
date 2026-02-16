@@ -21,20 +21,25 @@ export const waitlistEntries = pgTable("waitlist_entries", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   email: text("email").notNull(),
-  businessUrl: text("business_url"),
-  tierInterest: text("tier_interest").notNull(),
+  phone: text("phone").notNull(),
+  purpose: text("purpose").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const insertWaitlistSchema = createInsertSchema(waitlistEntries).pick({
   name: true,
   email: true,
-  businessUrl: true,
-  tierInterest: true,
+  phone: true,
+  purpose: true,
 }).extend({
   email: z.string().email("Invalid email address"),
   name: z.string().min(2, "Name must be at least 2 characters"),
-  tierInterest: z.enum(["apprentice", "knight", "royal", "ascended"]),
+  phone: z.string().min(1, "Phone number is required"),
+  purpose: z.enum([
+    "7-8 figure business",
+    "growing business",
+    "exploring AI",
+  ]),
 });
 
 export type InsertWaitlistEntry = z.infer<typeof insertWaitlistSchema>;

@@ -24,11 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertWaitlistSchema, type InsertWaitlistEntry } from "@shared/schema";
 
-interface ContactSectionProps {
-  preselectedTier?: string;
-}
-
-export function ContactSection({ preselectedTier }: ContactSectionProps) {
+export function ContactSection() {
   const { toast } = useToast();
 
   const form = useForm<InsertWaitlistEntry>({
@@ -36,8 +32,8 @@ export function ContactSection({ preselectedTier }: ContactSectionProps) {
     defaultValues: {
       name: "",
       email: "",
-      businessUrl: "",
-      tierInterest: (preselectedTier as InsertWaitlistEntry["tierInterest"]) || "apprentice",
+      phone: "",
+      purpose: "exploring AI",
     },
   });
 
@@ -141,19 +137,17 @@ export function ContactSection({ preselectedTier }: ContactSectionProps) {
 
                 <FormField
                   control={form.control}
-                  name="businessUrl"
+                  name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-300">
-                        Business URL (optional)
-                      </FormLabel>
+                      <FormLabel className="text-gray-300">Phone</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="https://yourbusiness.com"
+                          type="tel"
+                          placeholder="(555) 123-4567"
                           className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500"
-                          data-testid="input-business-url"
+                          data-testid="input-phone"
                           {...field}
-                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -163,11 +157,11 @@ export function ContactSection({ preselectedTier }: ContactSectionProps) {
 
                 <FormField
                   control={form.control}
-                  name="tierInterest"
+                  name="purpose"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-gray-300">
-                        Tier Interest
+                        Purpose
                       </FormLabel>
                       <Select
                         onValueChange={field.onChange}
@@ -176,23 +170,20 @@ export function ContactSection({ preselectedTier }: ContactSectionProps) {
                         <FormControl>
                           <SelectTrigger
                             className="bg-white/5 border-white/10 text-white"
-                            data-testid="select-tier"
+                            data-testid="select-purpose"
                           >
-                            <SelectValue placeholder="Select a tier" />
+                            <SelectValue placeholder="Select your purpose" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="bg-gray-900 border-white/10">
-                          <SelectItem value="apprentice" data-testid="select-tier-apprentice">
-                            Apprentice
+                          <SelectItem value="7-8 figure business" data-testid="select-purpose-enterprise">
+                            I run a 7–8 figure business and want AI to optimize operations immediately.
                           </SelectItem>
-                          <SelectItem value="knight" data-testid="select-tier-knight">
-                            Master
+                          <SelectItem value="growing business" data-testid="select-purpose-growth">
+                            I have a growing business and want to scale without adding more employees.
                           </SelectItem>
-                          <SelectItem value="royal" data-testid="select-tier-royal">
-                            Royal
-                          </SelectItem>
-                          <SelectItem value="ascended" data-testid="select-tier-ascended">
-                            Empire
+                          <SelectItem value="exploring AI" data-testid="select-purpose-explore">
+                            I'm exploring AI for future implementation and want early access.
                           </SelectItem>
                         </SelectContent>
                       </Select>

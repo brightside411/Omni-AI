@@ -18,8 +18,8 @@ async function ensureTablesExist() {
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         name TEXT NOT NULL,
         email TEXT NOT NULL,
-        business_url TEXT,
-        tier_interest TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        purpose TEXT NOT NULL,
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
@@ -90,10 +90,10 @@ export class SupabaseStorage implements IStorage {
     await this.waitForInit();
 
     const result = await pool.query(
-      `INSERT INTO waitlist_entries (name, email, business_url, tier_interest)
+      `INSERT INTO waitlist_entries (name, email, phone, purpose)
        VALUES ($1, $2, $3, $4)
        RETURNING *`,
-      [entry.name, entry.email, entry.businessUrl || null, entry.tierInterest]
+      [entry.name, entry.email, entry.phone, entry.purpose]
     );
 
     const row = result.rows[0];
@@ -101,8 +101,8 @@ export class SupabaseStorage implements IStorage {
       id: row.id,
       name: row.name,
       email: row.email,
-      businessUrl: row.business_url,
-      tierInterest: row.tier_interest,
+      phone: row.phone,
+      purpose: row.purpose,
       createdAt: new Date(row.created_at),
     };
   }
@@ -118,8 +118,8 @@ export class SupabaseStorage implements IStorage {
       id: row.id,
       name: row.name,
       email: row.email,
-      businessUrl: row.business_url,
-      tierInterest: row.tier_interest,
+      phone: row.phone,
+      purpose: row.purpose,
       createdAt: new Date(row.created_at),
     }));
   }

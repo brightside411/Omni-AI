@@ -57,7 +57,7 @@ export default function Landing() {
         <LegacySection />
         <EcosystemSection />
         <TestimonialsSection />
-        <ContactSection preselectedTier={selectedTier} />
+        <ContactSection />
       </main>
       <Footer />
       <BookDemoModal 
