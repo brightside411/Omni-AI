@@ -5,6 +5,7 @@ import { X, Calendar, User, Phone, Mail, Building2, Check, Loader2, ChevronLeft,
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 
 interface BookDemoModalProps {
@@ -76,6 +77,7 @@ const generateCalendarMonth = (year: number, month: number) => {
 
 export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
   const [modalStep, setModalStep] = useState<ModalStep>("form");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -492,11 +494,15 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
                     className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 border-0 text-white"
                     onClick={() => {
                       onClose();
-                      setLocation("/dashboard");
+                      if (user) {
+                        setLocation("/dashboard");
+                      } else {
+                        setLocation("/?signin=true");
+                      }
                     }}
                     data-testid="button-goto-dashboard"
                   >
-                    Dashboard
+                    {user ? "Dashboard" : "Sign In"}
                   </Button>
                 </div>
               </motion.div>
