@@ -11,6 +11,7 @@ import Details from "@/pages/details";
 import Dashboard from "@/pages/dashboard";
 import Join from "@/pages/join";
 import Admin from "@/pages/admin";
+import Interlinked from "@/pages/interlinked";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/join" component={Join} />
       <Route path="/admin" component={Admin} />
+      <Route path="/interlinked" component={Interlinked} />
       <Route component={NotFound} />
     </Switch>
   );
