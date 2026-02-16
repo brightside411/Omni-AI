@@ -53,8 +53,8 @@ export default function Landing() {
           onBookDemo={() => setIsDemoModalOpen(true)} 
           onSignIn={() => openAuthWithPrompt()}
         />
-        <LegacySection />
         <CampaignsSection />
+        <LegacySection />
         <EcosystemSection />
         <TestimonialsSection />
         <ContactSection preselectedTier={selectedTier} />
