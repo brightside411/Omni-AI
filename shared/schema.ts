@@ -47,6 +47,8 @@ export const demoBookings = pgTable("demo_bookings", {
   email: text("email").notNull(),
   businessName: text("business_name").notNull(),
   purpose: text("purpose").notNull(),
+  date: text("date").notNull(),
+  time: text("time").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -56,12 +58,16 @@ export const insertDemoBookingSchema = createInsertSchema(demoBookings).pick({
   email: true,
   businessName: true,
   purpose: true,
+  date: true,
+  time: true,
 }).extend({
   email: z.string().email("Invalid email address"),
   name: z.string().min(1, "Name is required"),
   phone: z.string().min(1, "Phone is required"),
   businessName: z.string().min(1, "Business name is required"),
   purpose: z.string().min(1, "Purpose is required"),
+  date: z.string().min(1, "Date is required"),
+  time: z.string().min(1, "Time is required"),
 });
 
 export type InsertDemoBooking = z.infer<typeof insertDemoBookingSchema>;
