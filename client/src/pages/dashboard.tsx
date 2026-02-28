@@ -6,14 +6,16 @@ import {
   Zap, Shield, Crown, Flame, Star, Calendar, Mail,
   ArrowRight, LogOut, User, Clock, Video, Play, Pause,
   TrendingUp, Target, Bot, BarChart3, Settings, Eye, MousePointerClick,
-  CircleDollarSign, Plus, FileEdit, MoreHorizontal
+  CircleDollarSign, Plus, FileEdit, MoreHorizontal, ChevronRight, Landmark
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { CursorSpotlight } from "@/components/cursor-spotlight";
+import { SponsorTab } from "@/components/sponsor-tab";
 
 const tierInfo: Record<string, { name: string; icon: typeof Zap; gradient: string; accent: string; level: number }> = {
   apprentice: { name: "Apprentice", icon: Zap, gradient: "from-slate-500 to-slate-600", accent: "text-slate-400", level: 0 },
@@ -132,9 +134,10 @@ interface DemoBooking {
 
 export default function Dashboard() {
   const { user, loading, signOut } = useAuth();
-  const { profile, profileLoading, isAdmin, onboardingComplete } = useProfile();
+  const { profile, profileLoading, isAdmin, isSponsor, onboardingComplete } = useProfile();
   const [, setLocation] = useLocation();
   const [campaignFilter, setCampaignFilter] = useState<"all" | CampaignStatus>("all");
+  const [headerClusterOpen, setHeaderClusterOpen] = useState(false);
   const currentTier = "apprentice";
   const currentTierData = tierInfo[currentTier];
   const TierIcon = currentTierData.icon;
@@ -196,17 +199,41 @@ export default function Dashboard() {
           </Link>
 
           <div className="flex items-center gap-3">
-            {isAdmin && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-orange-500/20 bg-orange-500/5 text-orange-400"
-                onClick={() => setLocation("/admin")}
-                data-testid="button-admin-panel"
-              >
-                <Shield className="w-3 h-3 mr-1.5" />
-                Admin
-              </Button>
+            {(isAdmin || isSponsor) && (
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-purple-500/20 bg-purple-500/5 text-purple-400"
+                  onClick={() => setHeaderClusterOpen(!headerClusterOpen)}
+                >
+                  {isAdmin && <Shield className="w-3 h-3 mr-1" />}
+                  {isSponsor && <Landmark className="w-3 h-3" />}
+                  <ChevronRight className={`w-3 h-3 ml-1 transition-transform ${headerClusterOpen ? 'rotate-90' : ''}`} />
+                </Button>
+                {headerClusterOpen && (
+                  <div className="absolute right-0 top-full mt-1 py-1 bg-black border border-white/10 rounded-lg shadow-xl z-50 min-w-[140px]">
+                    {isAdmin && (
+                      <button
+                        onClick={() => { setLocation("/admin"); setHeaderClusterOpen(false); }}
+                        className="w-full px-3 py-2 text-left text-sm text-gray-300 hover:bg-white/10 flex items-center gap-2"
+                      >
+                        <Shield className="w-3 h-3 text-orange-400" />
+                        Admin
+                      </button>
+                    )}
+                    {isSponsor && (
+                      <button
+                        onClick={() => { setLocation("/sponsor"); setHeaderClusterOpen(false); }}
+                        className="w-full px-3 py-2 text-left text-sm text-gray-300 hover:bg-white/10 flex items-center gap-2"
+                      >
+                        <Landmark className="w-3 h-3 text-green-400" />
+                        Sponsor
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             )}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10" data-testid="badge-tier-status">
               <TierIcon className={`w-4 h-4 ${currentTierData.accent}`} />
@@ -297,6 +324,12 @@ export default function Dashboard() {
             );
           })}
         </div>
+
+        {isSponsor && (
+          <motion.div {...fadeUp} transition={{ duration: 0.4 }}>
+            <SponsorTab />
+          </motion.div>
+        )}
 
         <motion.div {...fadeUp} transition={{ duration: 0.4, delay: 0.25 }}>
           <Card className="bg-white/[0.03] border-white/[0.06] overflow-visible">

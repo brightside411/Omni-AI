@@ -12,6 +12,8 @@ import Dashboard from "@/pages/dashboard";
 import Join from "@/pages/join";
 import Admin from "@/pages/admin";
 import Interlinked from "@/pages/interlinked";
+import Sponsor from "@/pages/sponsor";
+import SponsorInfo from "@/pages/sponsor-info";
 
 function Router() {
   return (
@@ -22,6 +24,8 @@ function Router() {
       <Route path="/join" component={Join} />
       <Route path="/admin" component={Admin} />
       <Route path="/interlinked" component={Interlinked} />
+      <Route path="/sponsor" component={Sponsor} />
+      <Route path="/sponsor/info" component={SponsorInfo} />
       <Route component={NotFound} />
     </Switch>
   );

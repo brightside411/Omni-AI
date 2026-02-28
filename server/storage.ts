@@ -2,7 +2,7 @@ import { type User, type InsertUser, type WaitlistEntry, type InsertWaitlistEntr
 import pg from "pg";
 
 if (!process.env.DATABASE_URL) {
-  console.error("DATABASE_URL is required for persistent storage");
+  console.log("DATABASE_URL not provided - using in-memory storage");
 }
 
 const pool = new pg.Pool({
@@ -225,4 +225,67 @@ export class SupabaseStorage implements IStorage {
   }
 }
 
-export const storage = new SupabaseStorage();
+export class MemStorage implements IStorage {
+  private users: Map<string, User> = new Map();
+  private waitlistEntries: Map<string, WaitlistEntry> = new Map();
+  private demoBookings: Map<string, DemoBooking> = new Map();
+  private webinarRegistrations: Map<string, WebinarRegistration> = new Map();
+
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find((user) => user.username === username);
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = crypto.randomUUID();
+    const user: User = { ...insertUser, id };
+    this.users.set(id, user);
+    return user;
+  }
+
+  async createWaitlistEntry(entry: InsertWaitlistEntry): Promise<WaitlistEntry> {
+    const id = crypto.randomUUID();
+    const waitlistEntry: WaitlistEntry = { ...entry, id, createdAt: new Date() };
+    this.waitlistEntries.set(id, waitlistEntry);
+    return waitlistEntry;
+  }
+
+  async getWaitlistEntries(): Promise<WaitlistEntry[]> {
+    return Array.from(this.waitlistEntries.values()).reverse();
+  }
+
+  async createDemoBooking(booking: InsertDemoBooking): Promise<DemoBooking> {
+    const id = crypto.randomUUID();
+    const newBooking: DemoBooking = { ...booking, id, createdAt: new Date() };
+    this.demoBookings.set(id, newBooking);
+    return newBooking;
+  }
+
+  async getDemoBookings(): Promise<DemoBooking[]> {
+    return Array.from(this.demoBookings.values()).reverse();
+  }
+
+  async createWebinarRegistration(registration: InsertWebinarRegistration): Promise<WebinarRegistration> {
+    const id = crypto.randomUUID();
+    const newRegistration: WebinarRegistration = { ...registration, id, createdAt: new Date() };
+    this.webinarRegistrations.set(id, newRegistration);
+    return newRegistration;
+  }
+
+  async getWebinarRegistrations(): Promise<WebinarRegistration[]> {
+    return Array.from(this.webinarRegistrations.values()).reverse();
+  }
+}
+
+const useMemoryStorage = !process.env.DATABASE_URL;
+
+if (useMemoryStorage) {
+  console.log("Using in-memory storage (no DATABASE_URL provided)");
+} else {
+  console.log("Using PostgreSQL storage");
+}
+
+export const storage = useMemoryStorage ? new MemStorage() : new SupabaseStorage();
