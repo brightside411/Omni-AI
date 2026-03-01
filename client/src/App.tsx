@@ -14,6 +14,7 @@ import Admin from "@/pages/admin";
 import Interlinked from "@/pages/interlinked";
 import Sponsor from "@/pages/sponsor";
 import SponsorInfo from "@/pages/sponsor-info";
+import SponsorApplication from "@/pages/sponsor-application";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/interlinked" component={Interlinked} />
       <Route path="/sponsor" component={Sponsor} />
       <Route path="/sponsor/info" component={SponsorInfo} />
+      <Route path="/sponsor/application" component={SponsorApplication} />
       <Route component={NotFound} />
     </Switch>
   );

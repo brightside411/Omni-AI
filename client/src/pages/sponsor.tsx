@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { 
   Landmark, Building2, Bot, Calendar, Mail, Target, ChevronDown, ChevronRight,
   CheckCircle, TrendingUp, Users, FileText, Eye, MousePointer, DollarSign,
-  MessageSquare, BarChart3
+  MessageSquare, BarChart3, LayoutDashboard
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -166,7 +166,11 @@ export default function Sponsor() {
             Omni AI
           </Link>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={() => setLocation("/dashboard")}>
+            <Button 
+              className="bg-gradient-to-r from-purple-600 to-blue-600 border-0 text-white"
+              onClick={() => setLocation("/dashboard")}
+            >
+              <LayoutDashboard className="w-4 h-4 mr-2" />
               Dashboard
             </Button>
             <Button variant="ghost" onClick={() => setLocation("/sponsor/info")}>

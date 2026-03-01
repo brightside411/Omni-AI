@@ -5,7 +5,8 @@ import {
   Zap, Shield, Crown, Users, TrendingUp, DollarSign, 
   Brain, MessageSquare, Calendar, Send, Search, FileText,
   Bot, BarChart3, ChevronRight, CheckCircle, Sparkles,
-  ArrowRight, Gift, Wallet, Building2
+  ArrowRight, Gift, Wallet, Building2, Target, Eye,
+  MousePointer, LineChart, LayoutDashboard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,18 +14,33 @@ import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { CursorSpotlight } from "@/components/cursor-spotlight";
 
-const aiCapabilities = [
-  { icon: MessageSquare, title: "Answer questions 24/7", desc: "Provides around-the-clock responses for administrators, prospective patients, and families" },
-  { icon: Calendar, title: "Book consultations", desc: "Schedules confidential calls or assessments and sends automatic reminders" },
-  { icon: Send, title: "Send follow-ups", desc: "Checks in with inquiries and keeps communication consistent so no lead is missed" },
-  { icon: Search, title: "Find potential clients", desc: "Identifies and engages people actively searching for treatment services" },
-  { icon: FileText, title: "Create marketing content", desc: "Produces and distributes video marketing, social media posts, and educational content" },
-  { icon: Brain, title: "Do research online", desc: "Gathers insights on trends, competitors, and local demand to support smarter strategy" },
-  { icon: Zap, title: "Automate operations", desc: "Organizes intake forms, updates records, and routes messages efficiently" },
-  { icon: BarChart3, title: "Provide insights", desc: "Analyzes performance, marketing data, and trends to help you scale" },
+const investmentAreas = [
+  { icon: Bot, title: "AI-powered lead generation", desc: "Systems that identify and capture qualified leads automatically" },
+  { icon: Calendar, title: "24/7 automated engagement", desc: "Continuous interaction with prospects and clients" },
+  { icon: Users, title: "Client acquisition workflows", desc: "Streamlined processes to convert inquiries into clients" },
+  { icon: Zap, title: "Operational automation", desc: "Reduce manual tasks and increase efficiency" },
+  { icon: FileText, title: "Marketing content production", desc: "Automated creation of promotional materials" },
+  { icon: BarChart3, title: "Data tracking and analytics", desc: "Real-time insights into performance and growth" },
 ];
 
-export default function Sponsor() {
+const aiCapabilities = [
+  { icon: MessageSquare, title: "24/7 Intelligent Response", desc: "Provides immediate answers to administrators, prospective patients, and families — eliminating missed opportunities." },
+  { icon: Calendar, title: "Consultation Scheduling Automation", desc: "Books confidential assessments and sends automated reminders to increase attendance rates." },
+  { icon: Send, title: "Automated Follow-Up Sequences", desc: "Maintains consistent communication with inquiries to improve conversion rates." },
+  { icon: Search, title: "Qualified Lead Identification", desc: "Engages individuals actively searching for addiction treatment services." },
+  { icon: FileText, title: "AI-Driven Marketing Content", desc: "Produces and distributes educational and promotional content to build authority and trust." },
+  { icon: Brain, title: "Market & Competitor Research", desc: "Analyzes treatment trends and regional demand to inform strategic decisions." },
+  { icon: Zap, title: "Operational Workflow Automation", desc: "Organizes intake forms, updates records, and routes communication efficiently." },
+  { icon: LineChart, title: "Performance Intelligence & Reporting", desc: "Transforms marketing and inquiry data into actionable growth insights." },
+];
+
+const caseStudies = [
+  { name: "Brent", company: "Young's Cabinet Refinishing", metric: "+247% leads" },
+  { name: "Adam", company: "Leifson Built", metric: "$1.2M generated" },
+  { name: "Steve", company: "Utah Addiction Center", metric: "89% conversion" },
+];
+
+export default function SponsorInfo() {
   const { user, loading: authLoading } = useAuth();
   const { profile, upsertProfile, profileLoading } = useProfile();
   const [, setLocation] = useLocation();
@@ -67,15 +83,13 @@ export default function Sponsor() {
             Omni AI
           </Link>
           <div className="flex items-center gap-3">
-            {user ? (
-              <Button variant="ghost" onClick={() => setLocation("/dashboard")}>
-                Dashboard
-              </Button>
-            ) : (
-              <Button variant="ghost" onClick={() => setLocation("/?signin=true")}>
-                Sign In
-              </Button>
-            )}
+            <Button 
+              className="bg-gradient-to-r from-purple-600 to-blue-600 border-0 text-white"
+              onClick={() => user ? setLocation("/dashboard") : setLocation("/?signin=true")}
+            >
+              <LayoutDashboard className="w-4 h-4 mr-2" />
+              Dashboard
+            </Button>
           </div>
         </div>
       </header>
@@ -85,119 +99,53 @@ export default function Sponsor() {
           initial="initial"
           animate="animate"
           variants={fadeUp}
-          className="text-center py-16 px-4"
+          className="text-center py-20 px-4"
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card neon-border mb-6">
             <Gift className="w-4 h-4 text-purple-400" />
-            <span className="text-sm text-gray-300">Sponsor Program</span>
+            <span className="text-sm text-gray-300">Omni AI Sponsor Program</span>
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            <span className="text-gradient">Become a Sponsor</span>
+            <span className="text-gradient">Sponsorship Overview</span>
           </h1>
           
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-8">
-            Invest in AI infrastructure and marketing. Watch your money grow through affiliate contracts and AI-powered automation.
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8 leading-relaxed">
+            Your sponsorship funds AI systems that generate qualified leads, automate operations, and deliver measurable growth.
+            <br /><br />
+            Every dollar supports infrastructure designed to increase efficiency, capture demand, and provide real-time performance visibility through your Sponsor Dashboard.
           </p>
 
-          {canActivate && (
-            <Button 
-              onClick={handleActivate}
-              disabled={activating || activated}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-lg px-8 py-6"
-            >
-              {activated ? (
-                <>
-                  <CheckCircle className="w-5 h-5 mr-2" />
-                  Activated! Go to Dashboard
-                </>
-              ) : activating ? (
-                <>
-                  <Sparkles className="w-5 h-5 mr-2 animate-pulse" />
-                  Activating...
-                </>
-              ) : (
-                <>
-                  Activate Sponsor Status
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </>
-              )}
-            </Button>
-          )}
-
-          {isSponsor && (
-            <div className="mt-6">
-              <Button 
-                onClick={() => setLocation("/dashboard")}
-                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-lg px-8 py-6"
-              >
-                View Your Sponsor Dashboard
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </div>
-          )}
+          <Button 
+            onClick={() => setLocation("/sponsor/application")}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-lg px-8 py-6"
+          >
+            Access Sponsor Portal
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
         </motion.div>
-
-        <section className="py-16 px-4">
-          <div className="max-w-6xl mx-auto">
-            <motion.div variants={fadeUp} className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Where is your money going?
-              </h2>
-              <p className="text-gray-400">Your investment powers two critical areas</p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <motion.div variants={fadeUp}>
-                <Card className="bg-gradient-to-br from-purple-900/30 to-purple-800/10 border-purple-500/20 h-full">
-                  <CardContent className="p-8">
-                    <div className="w-16 h-16 rounded-2xl bg-purple-500/20 flex items-center justify-center mb-4">
-                      <Brain className="w-8 h-8 text-purple-400" />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-4">AI Infrastructure</h3>
-                    <p className="text-gray-400">
-                      Building and maintaining powerful AI systems that work 24/7 to grow your business
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
-              <motion.div variants={fadeUp}>
-                <Card className="bg-gradient-to-br from-pink-900/30 to-pink-800/10 border-pink-500/20 h-full">
-                  <CardContent className="p-8">
-                    <div className="w-16 h-16 rounded-2xl bg-pink-500/20 flex items-center justify-center mb-4">
-                      <TrendingUp className="w-8 h-8 text-pink-400" />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-4">Marketing</h3>
-                    <p className="text-gray-400">
-                      Promoting affiliate contracts and driving revenue through strategic campaigns
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </div>
-          </div>
-        </section>
 
         <section className="py-16 px-4 bg-black/30">
           <div className="max-w-6xl mx-auto">
             <motion.div variants={fadeUp} className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                What the AI Infrastructure Does
+                Where Your Investment Goes
               </h2>
-              <p className="text-gray-400">8 powerful AI capabilities working for you</p>
+              <p className="text-gray-400">Your sponsorship directly funds:</p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {aiCapabilities.map((cap, idx) => (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {investmentAreas.map((item, idx) => (
                 <motion.div key={idx} variants={fadeUp}>
                   <Card className="bg-white/5 border-white/10 hover:border-purple-500/30 transition-colors h-full">
-                    <CardContent className="p-6">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-4">
-                        <cap.icon className="w-6 h-6 text-purple-400" />
+                    <CardContent className="p-6 flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
+                        <item.icon className="w-6 h-6 text-purple-400" />
                       </div>
-                      <h4 className="font-semibold mb-2">{cap.title}</h4>
-                      <p className="text-sm text-gray-400">{cap.desc}</p>
+                      <div>
+                        <h4 className="font-semibold mb-1">{item.title}</h4>
+                        <p className="text-sm text-gray-400">{item.desc}</p>
+                      </div>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -206,33 +154,86 @@ export default function Sponsor() {
           </div>
         </section>
 
-        <section className="py-16 px-4">
+        <section className="py-20 px-4">
+          <div className="max-w-6xl mx-auto">
+            <motion.div variants={fadeUp} className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                AI Infrastructure in Action
+              </h2>
+              <p className="text-gray-400">8 powerful systems working continuously for your growth</p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {aiCapabilities.map((cap, idx) => (
+                <motion.div key={idx} variants={fadeUp}>
+                  <Card className="bg-gradient-to-r from-purple-900/20 to-pink-900/10 border-purple-500/20">
+                    <CardContent className="p-6 flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                        <cap.icon className="w-6 h-6 text-purple-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold mb-2 text-purple-200">{cap.title}</h4>
+                        <p className="text-sm text-gray-400">{cap.desc}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 px-4 bg-black/30">
           <div className="max-w-4xl mx-auto">
             <motion.div variants={fadeUp} className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 How You'll See Results
               </h2>
-              <p className="text-gray-400">Track everything in your sponsor dashboard</p>
+              <p className="text-gray-400">Your Sponsor Dashboard provides real-time reporting on lead volume, engagement activity, response performance, and growth trends.</p>
             </motion.div>
 
-            <div className="space-y-4">
-              {[
-                { icon: CheckCircle, title: "Tasks Completed", desc: "See all the work your AI has done" },
-                { icon: DollarSign, title: "Revenue Generated", desc: "Track earnings from affiliate contracts" },
-                { icon: Building2, title: "Assets (Businesses)", desc: "Number of businesses under your affiliate contracts" },
-                { icon: Bot, title: "AI Agents", desc: "Personal Assistant, Newsletter Agent, Marketing Agent" },
-              ].map((item, idx) => (
+            <motion.div variants={fadeUp} className="mb-8">
+              <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/20 border border-purple-500/20 rounded-2xl p-8 text-center">
+                <BarChart3 className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+                <p className="text-gray-400 mb-4">(Screenshot of dashboard)</p>
+              </div>
+            </motion.div>
+
+            <motion.div variants={fadeUp} className="text-center">
+              <p className="text-lg text-gray-300 mb-6">
+                Monitor system activity, track measurable outcomes, and see exactly how your sponsorship translates into operational and revenue impact — all in one centralized view.
+              </p>
+              <Button 
+                onClick={() => isSponsor ? setLocation("/sponsor") : setLocation("/sponsor/application")}
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-lg px-8 py-6"
+              >
+                View Sponsor Dashboard
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </motion.div>
+          </div>
+        </section>
+
+        <section className="py-16 px-4">
+          <div className="max-w-6xl mx-auto">
+            <motion.div variants={fadeUp} className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Proven Results
+              </h2>
+              <p className="text-gray-400 text-lg">Real businesses. Measurable growth. Documented performance.</p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {caseStudies.map((study, idx) => (
                 <motion.div key={idx} variants={fadeUp}>
-                  <Card className="bg-gradient-to-r from-white/10 to-white/5 border-white/10">
-                    <CardContent className="p-6 flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                        <item.icon className="w-6 h-6 text-green-400" />
+                  <Card className="bg-gradient-to-br from-white/10 to-white/5 border-white/10 h-full">
+                    <CardContent className="p-8 text-center">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/30 to-pink-500/30 flex items-center justify-center mx-auto mb-4">
+                        <Building2 className="w-8 h-8 text-purple-300" />
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-lg">{item.title}</h4>
-                        <p className="text-gray-400">{item.desc}</p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-gray-500 ml-auto" />
+                      <h4 className="font-bold text-xl mb-1">{study.name}</h4>
+                      <p className="text-gray-400 mb-4">{study.company}</p>
+                      <p className="text-2xl font-bold text-green-400">{study.metric}</p>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -244,29 +245,39 @@ export default function Sponsor() {
         <section className="py-20 px-4 bg-gradient-to-b from-purple-900/20 to-transparent">
           <motion.div variants={fadeUp} className="text-center max-w-2xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready to Start Earning?
+              Ready to See the Impact Firsthand?
             </h2>
             <p className="text-gray-400 mb-8">
-              Join the sponsor program and let AI work for you around the clock
+              Access your dashboard to monitor performance — or apply to become an approved Omni AI sponsor.
             </p>
-            {user && !isSponsor ? (
-              <Button 
-                onClick={handleActivate}
-                disabled={activating || activated}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-lg px-8 py-6"
-              >
-                {activated ? "Activated!" : "Activate Now"}
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            ) : !user ? (
-              <Button 
-                onClick={() => setLocation("/?signin=true")}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-lg px-8 py-6"
-              >
-                Sign In to Activate
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            ) : null}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              {isSponsor ? (
+                <Button 
+                  onClick={() => setLocation("/sponsor")}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-lg px-8 py-6"
+                >
+                  Access Sponsor Portal
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              ) : (
+                <>
+                  <Button 
+                    onClick={() => user ? handleActivate() : setLocation("/sponsor/application")}
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-lg px-8 py-6"
+                  >
+                    {user ? "Apply Today" : "Apply Today"}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => setLocation("/sponsor/application")}
+                    className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 text-lg px-8 py-6"
+                  >
+                    Apply to Become a Sponsor
+                  </Button>
+                </>
+              )}
+            </div>
           </motion.div>
         </section>
       </main>
