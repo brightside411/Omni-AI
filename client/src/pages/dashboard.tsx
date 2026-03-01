@@ -138,7 +138,7 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const [campaignFilter, setCampaignFilter] = useState<"all" | CampaignStatus>("all");
   const [headerClusterOpen, setHeaderClusterOpen] = useState(false);
-  const tierMap: Record<number, string> = { 0: "apprentice", 1: "journeyman", 2: "expert", 3: "master" };
+  const tierMap: Record<number, string> = { 0: "apprentice", 1: "knight", 2: "royal", 3: "ascended" };
   const currentTier = tierMap[tier] || "apprentice";
   const currentTierData = tierInfo[currentTier];
   const TierIcon = currentTierData.icon;
@@ -163,7 +163,7 @@ export default function Dashboard() {
     }
   }, [user, loading, setLocation]);
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />

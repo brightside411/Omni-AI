@@ -94,7 +94,11 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       } else if (error) {
         console.error('Failed to fetch profile:', error);
       } else {
-        setProfile(data);
+        setProfile({
+          ...data,
+          is_sponsor: data.is_sponsor ?? false,
+          tier: data.tier ?? 0,
+        });
       }
     } catch (err) {
       console.error('Profile fetch error:', err);

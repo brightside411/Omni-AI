@@ -41,3 +41,6 @@ A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cau
 4:22:03 PM [vite] (client) hmr update /src/App.tsx, /src/pages/admin.tsx, /src/pages/sponsor-application.tsx, /src/pages/sponsor-info.tsx, /src/pages/sponsor.tsx, /src/pages/dashboard.tsx, /src/pages/join.tsx
 4:22:23 PM [vite] (client) hmr update /src/pages/dashboard.tsx, /src/index.css
 4:24:14 PM [express] GET /api/supabase-config 304 in 1ms :: {"url":"https://lqufkkalazkseqqnsnqm.supabase.co","anonKey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxxdWZra2FsYXprc2VxcW5zbnFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxNTE4NzksImV4cCI6MjA4NTcyNzg3OX0.wyRH8h23HQodrkPS68-EPpFpfaWlcDM8HtwXDJlKyNA"}
+4:35:27 PM [vite] (client) hmr update /src/hooks/use-profile.tsx, /src/index.css
+4:35:56 PM [vite] (client) hmr update /src/pages/dashboard.tsx, /src/index.css
+4:36:10 PM [vite] (client) hmr update /src/pages/dashboard.tsx, /src/index.css
