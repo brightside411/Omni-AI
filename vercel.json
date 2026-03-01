@@ -1,25 +1,18 @@
 {
   "builds": [
     {
-      "use": "@vercel/node",
-      "src": "server/index.ts"
+      "src": "server/index.ts",
+      "use": "@vercel/node"
     },
     {
-      "use": "@vercel/static",
-      "config": {
-        "source": "dist/public/**",
-        "destination": ""
-      }
+      "src": "dist/public",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "server/index.ts"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "dist/public/$1"
+      "dest": "/server/index.ts"
     }
   ]
 }
