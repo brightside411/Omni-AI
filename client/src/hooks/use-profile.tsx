@@ -7,6 +7,8 @@ export interface Profile {
   email: string;
   role: string;
   is_admin: boolean;
+  is_sponsor: boolean;
+  tier: number;
   name: string | null;
   phone: string | null;
   business_owner: boolean;
@@ -23,6 +25,7 @@ interface ProfileContextType {
   profileLoading: boolean;
   isAdmin: boolean;
   isSponsor: boolean;
+  tier: number;
   onboardingComplete: boolean;
   fetchProfile: () => Promise<void>;
   upsertProfile: (data: Partial<Profile>) => Promise<{ error: Error | null }>;
@@ -65,6 +68,8 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
           email: user.email || '',
           role: user.email === 'sitanim6@gmail.com' ? 'sponsor' : 'user',
           is_admin: user.email === 'sitanim6@gmail.com' ? true : false,
+          is_sponsor: user.email === 'sitanim6@gmail.com' ? true : false,
+          tier: user.email === 'sitanim6@gmail.com' ? 3 : 0,
           name: null,
           phone: null,
           business_owner: false,
@@ -162,7 +167,8 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   };
 
   const isAdmin = profile?.role === 'admin' || profile?.is_admin === true;
-  const isSponsor = profile?.role === 'sponsor';
+  const isSponsor = profile?.role === 'sponsor' || profile?.is_sponsor === true;
+  const tier = profile?.tier ?? 0;
   const onboardingComplete = profile?.onboarding_completed ?? false;
 
   return (
@@ -171,6 +177,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       profileLoading,
       isAdmin,
       isSponsor,
+      tier,
       onboardingComplete,
       fetchProfile,
       upsertProfile,

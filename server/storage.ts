@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type WaitlistEntry, type InsertWaitlistEntry, type DemoBooking, type InsertDemoBooking, type WebinarRegistration, type InsertWebinarRegistration } from "@shared/schema";
+import { type User, type InsertUser, type WaitlistEntry, type InsertWaitlistEntry, type DemoBooking, type InsertDemoBooking, type WebinarRegistration, type InsertWebinarRegistration, type AdminUser, type InsertAdminUser, type Profile, type InsertProfile } from "@shared/schema";
 import pg from "pg";
 
 if (!process.env.DATABASE_URL) {
@@ -51,7 +51,25 @@ async function ensureTablesExist() {
       )
     `);
 
-    console.log("Supabase tables verified/created: waitlist_entries, demo_bookings, webinar_registrations");
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS admin_users (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        email TEXT NOT NULL UNIQUE,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS profiles (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        email TEXT NOT NULL UNIQUE,
+        is_sponsor BOOLEAN NOT NULL DEFAULT FALSE,
+        tier INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+
+    console.log("Supabase tables verified/created: waitlist_entries, demo_bookings, webinar_registrations, admin_users, profiles");
   } catch (err: any) {
     console.error("Failed to create tables:", err.message);
   } finally {
@@ -69,6 +87,12 @@ export interface IStorage {
   getDemoBookings(): Promise<DemoBooking[]>;
   createWebinarRegistration(registration: InsertWebinarRegistration): Promise<WebinarRegistration>;
   getWebinarRegistrations(): Promise<WebinarRegistration[]>;
+  createAdminUser(adminUser: InsertAdminUser): Promise<AdminUser>;
+  getAdminUsers(): Promise<AdminUser[]>;
+  isAdminEmail(email: string): Promise<boolean>;
+  createProfile(profile: InsertProfile): Promise<Profile>;
+  getProfile(email: string): Promise<Profile | undefined>;
+  updateProfile(email: string, profile: Partial<InsertProfile>): Promise<Profile | undefined>;
 }
 
 export class SupabaseStorage implements IStorage {
@@ -223,6 +247,119 @@ export class SupabaseStorage implements IStorage {
       createdAt: new Date(row.created_at),
     }));
   }
+
+  async createAdminUser(adminUser: InsertAdminUser): Promise<AdminUser> {
+    await this.waitForInit();
+
+    const result = await pool.query(
+      `INSERT INTO admin_users (email) VALUES ($1) RETURNING *`,
+      [adminUser.email]
+    );
+
+    const row = result.rows[0];
+    return {
+      id: row.id,
+      email: row.email,
+      createdAt: new Date(row.created_at),
+    };
+  }
+
+  async getAdminUsers(): Promise<AdminUser[]> {
+    await this.waitForInit();
+
+    const result = await pool.query(`SELECT * FROM admin_users ORDER BY created_at DESC`);
+
+    return result.rows.map((row: any) => ({
+      id: row.id,
+      email: row.email,
+      createdAt: new Date(row.created_at),
+    }));
+  }
+
+  async isAdminEmail(email: string): Promise<boolean> {
+    await this.waitForInit();
+
+    const result = await pool.query(
+      `SELECT 1 FROM admin_users WHERE email = $1`,
+      [email]
+    );
+
+    return result.rows.length > 0;
+  }
+
+  async createProfile(profile: InsertProfile): Promise<Profile> {
+    await this.waitForInit();
+
+    const result = await pool.query(
+      `INSERT INTO profiles (email, is_sponsor, tier) VALUES ($1, $2, $3) RETURNING *`,
+      [profile.email, profile.isSponsor, profile.tier]
+    );
+
+    const row = result.rows[0];
+    return {
+      id: row.id,
+      email: row.email,
+      isSponsor: row.is_sponsor,
+      tier: row.tier,
+      createdAt: new Date(row.created_at),
+    };
+  }
+
+  async getProfile(email: string): Promise<Profile | undefined> {
+    await this.waitForInit();
+
+    const result = await pool.query(
+      `SELECT * FROM profiles WHERE email = $1`,
+      [email]
+    );
+
+    if (result.rows.length === 0) return undefined;
+
+    const row = result.rows[0];
+    return {
+      id: row.id,
+      email: row.email,
+      isSponsor: row.is_sponsor,
+      tier: row.tier,
+      createdAt: new Date(row.created_at),
+    };
+  }
+
+  async updateProfile(email: string, profile: Partial<InsertProfile>): Promise<Profile | undefined> {
+    await this.waitForInit();
+
+    const updates: string[] = [];
+    const values: any[] = [];
+    let paramIndex = 1;
+
+    if (profile.isSponsor !== undefined) {
+      updates.push(`is_sponsor = $${paramIndex++}`);
+      values.push(profile.isSponsor);
+    }
+    if (profile.tier !== undefined) {
+      updates.push(`tier = $${paramIndex++}`);
+      values.push(profile.tier);
+    }
+
+    if (updates.length === 0) return this.getProfile(email);
+
+    values.push(email);
+    const result = await pool.query(
+      `UPDATE profiles SET ${updates.join(", ")} WHERE email = $${paramIndex} RETURNING *`,
+      values
+    );
+
+    if (result.rows.length === 0) return undefined;
+
+    const row = result.rows[0];
+    return {
+      id: row.id,
+      email: row.email,
+      isSponsor: row.is_sponsor,
+      tier: row.tier,
+      createdAt: new Date(row.created_at),
+    };
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -230,6 +367,8 @@ export class MemStorage implements IStorage {
   private waitlistEntries: Map<string, WaitlistEntry> = new Map();
   private demoBookings: Map<string, DemoBooking> = new Map();
   private webinarRegistrations: Map<string, WebinarRegistration> = new Map();
+  private adminUsers: Map<string, AdminUser> = new Map();
+  private profiles: Map<string, Profile> = new Map();
 
   async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
@@ -277,6 +416,47 @@ export class MemStorage implements IStorage {
 
   async getWebinarRegistrations(): Promise<WebinarRegistration[]> {
     return Array.from(this.webinarRegistrations.values()).reverse();
+  }
+
+  async createAdminUser(adminUser: InsertAdminUser): Promise<AdminUser> {
+    const id = crypto.randomUUID();
+    const newAdminUser: AdminUser = { ...adminUser, id, createdAt: new Date() };
+    this.adminUsers.set(id, newAdminUser);
+    return newAdminUser;
+  }
+
+  async getAdminUsers(): Promise<AdminUser[]> {
+    return Array.from(this.adminUsers.values()).reverse();
+  }
+
+  async isAdminEmail(email: string): Promise<boolean> {
+    return Array.from(this.adminUsers.values()).some((admin) => admin.email === email);
+  }
+
+  async createProfile(profile: InsertProfile): Promise<Profile> {
+    const id = crypto.randomUUID();
+    const newProfile: Profile = { 
+      ...profile, 
+      id, 
+      isSponsor: profile.isSponsor ?? false,
+      tier: profile.tier ?? 0,
+      createdAt: new Date() 
+    };
+    this.profiles.set(id, newProfile);
+    return newProfile;
+  }
+
+  async getProfile(email: string): Promise<Profile | undefined> {
+    return Array.from(this.profiles.values()).find((p) => p.email === email);
+  }
+
+  async updateProfile(email: string, profile: Partial<InsertProfile>): Promise<Profile | undefined> {
+    const existing = await this.getProfile(email);
+    if (!existing) return undefined;
+    
+    const updated: Profile = { ...existing, ...profile };
+    this.profiles.set(existing.id, updated);
+    return updated;
   }
 }
 

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -16,6 +16,39 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+export const adminUsers = pgTable("admin_users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAdminUserSchema = createInsertSchema(adminUsers).pick({
+  email: true,
+});
+
+export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
+export type AdminUser = typeof adminUsers.$inferSelect;
+
+export const profiles = pgTable("profiles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull().unique(),
+  isSponsor: boolean("is_sponsor").notNull().default(false),
+  tier: integer("tier").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertProfileSchema = createInsertSchema(profiles).pick({
+  email: true,
+  isSponsor: true,
+  tier: true,
+}).extend({
+  email: z.string().email("Invalid email address"),
+  tier: z.number().min(0).max(3),
+});
+
+export type InsertProfile = z.infer<typeof insertProfileSchema>;
+export type Profile = typeof profiles.$inferSelect;
 
 export const waitlistEntries = pgTable("waitlist_entries", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

@@ -134,11 +134,12 @@ interface DemoBooking {
 
 export default function Dashboard() {
   const { user, loading, signOut } = useAuth();
-  const { profile, profileLoading, isAdmin, isSponsor, onboardingComplete } = useProfile();
+  const { profile, profileLoading, isAdmin, isSponsor, tier, onboardingComplete } = useProfile();
   const [, setLocation] = useLocation();
   const [campaignFilter, setCampaignFilter] = useState<"all" | CampaignStatus>("all");
   const [headerClusterOpen, setHeaderClusterOpen] = useState(false);
-  const currentTier = "apprentice";
+  const tierMap: Record<number, string> = { 0: "apprentice", 1: "journeyman", 2: "expert", 3: "master" };
+  const currentTier = tierMap[tier] || "apprentice";
   const currentTierData = tierInfo[currentTier];
   const TierIcon = currentTierData.icon;
 
