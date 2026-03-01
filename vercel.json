@@ -1,18 +1,6 @@
 {
-  "builds": [
-    {
-      "src": "server/index.ts",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "dist/public",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/server/index.ts"
-    }
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/index.cjs" },
+    { "source": "/:path*", "destination": "/index.html" }
   ]
 }
